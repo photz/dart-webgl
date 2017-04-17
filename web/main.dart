@@ -12,6 +12,9 @@ class WebGlApp {
   CanvasElement _canvas;
   RenderingContext _gl;
   List _scene;
+  Vector3 _ambientLightColor;
+  Vector3 _lightDirection;
+  Vector3 _lightColor;
 
   WebGlApp(int width, int height) {
 
@@ -36,6 +39,10 @@ class WebGlApp {
     //this.addObjectToScene(new Pyramid(this._gl));
 
     this._gl.enable(DEPTH_TEST);
+
+    this._ambientLightColor = new Vector3(0.05, 0.05, 0.05);
+    this._lightDirection = new Vector3(0.5, 3.0, 4.0);
+    this._lightColor = new Vector3(1.0, 1.0, 1.0);
   }
 
   void addObjectToScene(obj) {
@@ -75,7 +82,9 @@ class WebGlApp {
     Matrix4 mvp = m * v;
 
     for (var obj in this._scene) {
-      obj.draw(mvp, time);
+      obj.draw(mvp, time,
+          this._lightColor, this._lightDirection,
+          this._ambientLightColor);
     }
   }
 

@@ -35,12 +35,20 @@ class Cube {
   static const String vshader = """
 attribute vec4 a_Position;
 attribute vec4 a_Color;
+attribute vec4 a_Normal;
+uniform vec3 u_AmbientLightColor;
+uniform vec3 u_LightColor;
+uniform vec3 u_LightDirection;
 uniform mat4 u_ViewMatrix;
 uniform mat4 u_ModelMatrix;
 varying vec4 v_Color;
 void main() {
-  gl_Position = (u_ViewMatrix * u_ModelMatrix) * a_Position;
-  v_Color = a_Color;
+  gl_Position = (u_ViewMatrix * u_ModelMatrix) * a_Position;;
+
+  vec3 normal = normalize(a_Normal.xyz);
+  float nDotL = max(dot(u_LightDirection, normal), 0.0);
+  vec3 diffuse = u_LightColor * a_Color.rgb * nDotL;
+  v_Color = vec4(diffuse + u_AmbientLightColor, a_Color.a);  
 }
 """;
 
@@ -68,10 +76,16 @@ void main() {
       _program = createProgram(_gl, vshader, fshader);
       _gl.useProgram(program);
       _initVertexBuffers(gl, program);
+      _initNormalsBuffer(gl, program);
     }
 
     this._x = x;
     this._y = y;
+  }
+
+  void _setAmbientLightColor(Vector3 ambientLightColor) {
+    gl.uniform3fv(this._u('u_AmbientLightColor'),
+        ambientLightColor.storage);
   }
 
   UniformLocation _u(String uniformName) {
@@ -90,10 +104,17 @@ void main() {
     this._y = y;
   }
 
-  void draw(Matrix4 mvp, time) {
+  void draw(Matrix4 mvp, time, Vector3 lightColor,
+      Vector3 lightDirection, Vector3 ambientLightColor) {
+
+    gl.uniform3fv(this._u('u_LightColor'), lightColor.storage);
+    gl.uniform3fv(this._u('u_LightDirection'), lightDirection.storage);
+    this._setAmbientLightColor(ambientLightColor);
+
     gl.useProgram(this.program);
     this._drawCube(mvp);
   }
+
 
   void _drawCube(Matrix4 viewMatrix) {
     this.gl.uniformMatrix4fv(this._u('u_ViewMatrix'),
@@ -162,8 +183,37 @@ void main() {
     final Buffer indexBuffer = gl.createBuffer();
     gl.bindBuffer(ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(ELEMENT_ARRAY_BUFFER, indices, STATIC_DRAW);
+
   }
 
 
+  static void _initNormalsBuffer(RenderingContext gl, Program program) {
+    final Float32List normals = new Float32List.fromList([
+    0.0, 0.0, 1.0,   0.0, 0.0, 1.0,   0.0, 0.0, 1.0,   0.0, 0.0, 1.0,  // v0-v1-v2-v3 front
+    1.0, 0.0, 0.0,   1.0, 0.0, 0.0,   1.0, 0.0, 0.0,   1.0, 0.0, 0.0,  // v0-v3-v4-v5 right
+    0.0, 1.0, 0.0,   0.0, 1.0, 0.0,   0.0, 1.0, 0.0,   0.0, 1.0, 0.0,  // v0-v5-v6-v1 up
+   -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,  // v1-v6-v7-v2 left
+    0.0,-1.0, 0.0,   0.0,-1.0, 0.0,   0.0,-1.0, 0.0,   0.0,-1.0, 0.0,  // v7-v4-v3-v2 down
+    0.0, 0.0,-1.0,   0.0, 0.0,-1.0,   0.0, 0.0,-1.0,   0.0, 0.0,-1.0,   // v4-v7-v6-v5 back
+    ]);
 
+    final Buffer normalsBuffer = gl.createBuffer();
+
+    final int a_Normal = gl.getAttribLocation(program, 'a_Normal');
+
+    gl.bindBuffer(ARRAY_BUFFER, normalsBuffer);
+
+    gl.bufferData(ARRAY_BUFFER, normals, STATIC_DRAW);
+
+    gl.vertexAttribPointer(a_Normal,
+        3,
+        FLOAT,
+        false,
+        0,
+        0);
+
+    gl.enableVertexAttribArray(a_Normal);
+
+    gl.bindBuffer(ARRAY_BUFFER, null);
+  }
 }
