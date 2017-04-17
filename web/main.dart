@@ -7,14 +7,19 @@ import 'cube.dart';
 import 'pyramid.dart';
 import 'dart:math' as Math;
 
+
 class WebGlApp {
   CanvasElement _canvas;
   RenderingContext _gl;
   List _scene;
 
-  WebGlApp() {
+  WebGlApp(int width, int height) {
 
     this._canvas = new CanvasElement();
+
+    this._canvas.width = width;
+    this._canvas.height = height;
+
 
     this._gl = new DebugRenderingContext(this._canvas.getContext('webgl'));
 
@@ -35,11 +40,6 @@ class WebGlApp {
     this._scene.add(obj);
   }
 
-  void setSize(int width, int height) {
-    this._canvas.width = width;
-    this._canvas.height = height;
-  }
-
   void startLoop() {
     window.animationFrame.then(this._loop);
   }
@@ -56,7 +56,7 @@ class WebGlApp {
     double zNear = 1.0;
     double zFar = 100.0;
     Matrix4 m = makePerspectiveMatrix(fovYRadians,
-        aspectRatio, zNear, zFar);
+        this._canvas.width / this._canvas.height, zNear, zFar);
 
     m = createPerspectiveMatrix(fovYRadians, zNear, zFar);
 
@@ -118,8 +118,7 @@ class WebGlApp {
 
 
 void main() {
-  WebGlApp a = new WebGlApp();
-  a.setSize(700, 700);
+  WebGlApp a = new WebGlApp(640, 480);
   document.body.children.add(a.getElement());
   a.startLoop();
 }
