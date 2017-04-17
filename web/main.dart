@@ -106,11 +106,11 @@ class WebGlApp {
         break;
 
       case KeyCode.UP:
-        player.goTo(player.x, player.y+1);
+        player.goTo(player.x, player.y-1);
         break;
 
       case KeyCode.DOWN:
-        player.goTo(player.x, player.y-1);
+        player.goTo(player.x, player.y+1);
         break;
     }
   }
