@@ -5,8 +5,6 @@ import 'dart:web_gl';
 Program createProgram(RenderingContext gl,
     String vShaderSource, String fShaderSource) {
 
-  print('creating a new program');
-
   Shader vShader = loadShader(gl, RenderingContext.VERTEX_SHADER,
       vShaderSource);
 
