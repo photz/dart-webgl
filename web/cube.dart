@@ -103,7 +103,7 @@ void main() {
         viewMatrix.storage);
 
 
-    double multiplier = 1.5;
+    double multiplier = 2.0;
 
     Matrix4 modelMatrix = new Matrix4.translationValues(
         this._x * multiplier, 0.0, this._y * multiplier);
