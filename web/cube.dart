@@ -1,9 +1,39 @@
 import 'package:vector_math/vector_math.dart';
 import 'dart:typed_data';
 import 'dart:web_gl';
-import 'scene_object.dart';
 
-class Cube extends SceneObject {
+Program createProgram(RenderingContext gl,
+    String vShaderSource, String fShaderSource) {
+
+  print('creating a new program');
+
+  Shader vShader = loadShader(gl, RenderingContext.VERTEX_SHADER,
+      vShaderSource);
+
+  Shader fShader = loadShader(gl, RenderingContext.FRAGMENT_SHADER,
+      fShaderSource);
+
+  Program program = gl.createProgram();
+
+  gl.attachShader(program, vShader);
+  gl.attachShader(program, fShader);
+  gl.linkProgram(program);
+  return program;
+}
+
+Shader loadShader(RenderingContext gl, int type, String source) {
+  Shader shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  print(gl.getShaderInfoLog(shader));
+  return shader;
+}
+
+class Cube {
+
+  static RenderingContext _gl;
+  static Program _program;
+
   static const String vshader = """
 attribute vec4 a_Position;
 attribute vec4 a_Color;
@@ -25,15 +55,24 @@ void main() {
 }
 """;
 
-  Cube(RenderingContext gl) : super(gl, vshader, fshader) {
+  RenderingContext get gl => _gl;
+  Program get program => _program;
+  int _x;
+  int _y;
 
-    //this._program = SceneObject._createProgram(this._gl,
-    //Cube.vshader, Cube.fshader);
+  int get x => _x;
+  int get y => _y;
 
-    gl.useProgram(program);
+  Cube.create(RenderingContext gl, int x, int y) {
+    if (_gl == null) {
+      _gl = gl;
+      _program = createProgram(_gl, vshader, fshader);
+      _gl.useProgram(program);
+      _initVertexBuffers(gl, program);
+    }
 
-    _initVertexBuffers(gl, program);
-
+    this._x = x;
+    this._y = y;
   }
 
   UniformLocation _u(String uniformName) {
@@ -47,6 +86,10 @@ void main() {
     return u;
   }
 
+  void goTo(int x, int y) {
+    this._x = x;
+    this._y = y;
+  }
 
   void draw(Matrix4 mvp, time) {
     gl.useProgram(this.program);
@@ -54,9 +97,15 @@ void main() {
   }
 
   void _drawCube(Matrix4 mvp) {
+    Matrix4 m = new Matrix4.copy(mvp);
+    double multiplier = 1.5;
+    m.translate(this._x * multiplier,
+        0.0,
+        this.y * multiplier);
+
     this.gl.uniformMatrix4fv(this._u('u_MvpMatrix'),
         false,
-        mvp.storage);
+        m.storage);
 
     this.gl.drawElements(TRIANGLES, 36, UNSIGNED_BYTE, 0);
   }
