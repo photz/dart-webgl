@@ -34,6 +34,8 @@ class WebGlApp {
     this.addObjectToScene(new Cube.create(this._gl, 2, 3));
     this.addObjectToScene(new Cube.create(this._gl, 4, 1));
     //this.addObjectToScene(new Pyramid(this._gl));
+
+    this._gl.enable(DEPTH_TEST);
   }
 
   void addObjectToScene(obj) {
