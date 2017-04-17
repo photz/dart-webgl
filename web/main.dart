@@ -83,9 +83,9 @@ class DebugRenderingContext implements WebGL.RenderingContext {
   }
 }
 
+class Cube {
+  Program _program;
 
-class WebGlApp {
-  
   static const String vshader = """
 attribute vec4 a_Position;
 attribute vec4 a_Color;
@@ -107,32 +107,18 @@ void main() {
 }
 """;
 
-  CanvasElement _canvas;
-  
   RenderingContext _gl;
 
-  Program _program;
-
-  WebGlApp() {
-
-    this._canvas = new CanvasElement();
-
-    this._gl = new DebugRenderingContext(this._canvas.getContext('webgl'));
+  Cube(RenderingContext gl) {
+    this._gl = gl;
 
     this._program = _createProgram(this._gl,
-        WebGlApp.vshader, WebGlApp.fshader);
+        Cube.vshader, Cube.fshader);
 
     this._gl.useProgram(this._program);
 
     _initVertexBuffers(this._gl, this._program);
 
-    this._gl.clearColor(0, 0, 0, 1);
-    print(this._gl.getProgramInfoLog(this._program));
-  }
-
-  void setSize(int width, int height) {
-    this._canvas.width = width;
-    this._canvas.height = height;
   }
 
   UniformLocation _u(String uniformName) {
@@ -146,43 +132,18 @@ void main() {
     return u;
   }
 
+  void draw(Matrix4 mvp) {
+    this._gl.useProgram(this._program);
+    this._drawCube(mvp);
+    print(this._gl.getProgramInfoLog(this._program));
+  }
+
   void _drawCube(Matrix4 mvp) {
     this._gl.uniformMatrix4fv(this._u('u_MvpMatrix'),
         false,
         mvp.storage);
 
     this._gl.drawElements(TRIANGLES, 36, UNSIGNED_BYTE, 0);
-  }
-
-  void startLoop() {
-    window.animationFrame.then(this._loop);
-  }
-
-  void _loop(x) {
-    this._redraw();
-    //window.animationFrame.then(this._loop);
-  }
-
-  void _redraw() {
-    this._gl.clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
-    //Matrix4 m = makePerspectiveMatrix(30.0, 1.0, 1.0, 100.0);
-
-    Matrix4 m = new Matrix4.fromList([
-      3.7, 0.0, 0.0, 0.0,
-      0.0, 3.7, 0.0, 0.0,
-      0.0, 0.0, -1.0, -1.0,
-      0.0, 0.0, -2.0, 0.0
-    ]);
-
-    Matrix4 v = makeViewMatrix(new Vector3(18.0, 18.0, 42.0),
-        new Vector3(0.0, 0.0, 0.0),
-        new Vector3(0.0, 1.0, 0.0));
-
-    Matrix4 mvp = m * v;
-
-    this._drawCube(mvp);
-
-    print(this._gl.getProgramInfoLog(this._program));
   }
 
   static void _initVertexBuffers(RenderingContext gl, Program program) {
@@ -259,6 +220,68 @@ void main() {
     print(gl.getShaderInfoLog(shader));
     return shader;
   }
+
+
+}
+
+class WebGlApp {
+  CanvasElement _canvas;
+  RenderingContext _gl;
+  List _scene;
+
+  WebGlApp() {
+
+    this._canvas = new CanvasElement();
+
+    this._gl = new DebugRenderingContext(this._canvas.getContext('webgl'));
+
+    this._gl.clearColor(0, 0, 0, 1);
+
+    this._scene = new List();
+
+    this.addObjectToScene(new Cube(this._gl));
+  }
+
+  void addObjectToScene(obj) {
+    this._scene.add(obj);
+  }
+
+  void setSize(int width, int height) {
+    this._canvas.width = width;
+    this._canvas.height = height;
+  }
+
+  void startLoop() {
+    window.animationFrame.then(this._loop);
+  }
+
+  void _loop(x) {
+    this._redraw();
+    //window.animationFrame.then(this._loop);
+  }
+
+  void _redraw() {
+    this._gl.clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
+    //Matrix4 m = makePerspectiveMatrix(30.0, 1.0, 1.0, 100.0);
+
+    Matrix4 m = new Matrix4.fromList([
+      3.7, 0.0, 0.0, 0.0,
+      0.0, 3.7, 0.0, 0.0,
+      0.0, 0.0, -1.0, -1.0,
+      0.0, 0.0, -2.0, 0.0
+    ]);
+
+    Matrix4 v = makeViewMatrix(new Vector3(18.0, 18.0, 42.0),
+        new Vector3(0.0, 0.0, 0.0),
+        new Vector3(0.0, 1.0, 0.0));
+
+    Matrix4 mvp = m * v;
+
+    for (var obj in this._scene) {
+      obj.draw(mvp);
+    }
+  }
+
 
   Element getElement() {
     return this._canvas;
