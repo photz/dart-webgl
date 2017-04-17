@@ -21,6 +21,8 @@ class WebGlApp {
 
     this._scene = new List();
 
+    document.body.onKeyDown.listen(this._onKeyDown);
+
     this.addObjectToScene(new Cube(this._gl));
     this.addObjectToScene(new Pyramid(this._gl));
   }
@@ -67,6 +69,26 @@ class WebGlApp {
 
   Element getElement() {
     return this._canvas;
+  }
+
+  void _onKeyDown(KeyboardEvent e) {
+    switch (e.keyCode) {
+      case KeyCode.LEFT:
+        
+        break;
+
+      case KeyCode.RIGHT:
+
+        break;
+
+      case KeyCode.UP:
+
+        break;
+
+      case KeyCode.DOWN:
+
+        break;
+    }
   }
 }
 
