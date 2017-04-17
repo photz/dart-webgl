@@ -37,10 +37,11 @@ class Cube {
   static const String vshader = """
 attribute vec4 a_Position;
 attribute vec4 a_Color;
-uniform mat4 u_MvpMatrix;
+uniform mat4 u_ViewMatrix;
+uniform mat4 u_ModelMatrix;
 varying vec4 v_Color;
 void main() {
-  gl_Position = u_MvpMatrix * a_Position;
+  gl_Position = (u_ViewMatrix * u_ModelMatrix) * a_Position;
   v_Color = a_Color;
 }
 """;
@@ -96,16 +97,21 @@ void main() {
     this._drawCube(mvp);
   }
 
-  void _drawCube(Matrix4 mvp) {
-    Matrix4 m = new Matrix4.copy(mvp);
-    double multiplier = 1.5;
-    m.translate(this._x * multiplier,
-        0.0,
-        this.y * multiplier);
-
-    this.gl.uniformMatrix4fv(this._u('u_MvpMatrix'),
+  void _drawCube(Matrix4 viewMatrix) {
+    this.gl.uniformMatrix4fv(this._u('u_ViewMatrix'),
         false,
-        m.storage);
+        viewMatrix.storage);
+
+
+    double multiplier = 1.5;
+
+    Matrix4 modelMatrix = new Matrix4.translationValues(
+        this._x * multiplier, 0.0, this._y * multiplier);
+
+    this.gl.uniformMatrix4fv(this._u('u_ModelMatrix'),
+        false,
+        modelMatrix.storage);
+
 
     this.gl.drawElements(TRIANGLES, 36, UNSIGNED_BYTE, 0);
   }
