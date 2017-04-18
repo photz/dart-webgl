@@ -129,9 +129,8 @@ class WebGlApp {
   }
 }
 
-
 void main() {
-  WebGlApp a = new WebGlApp(640, 480);
+  WebGlApp a = new WebGlApp(window.innerWidth, window.innerHeight);
   document.body.children.add(a.getElement());
   a.startLoop();
 }
