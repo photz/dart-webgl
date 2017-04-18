@@ -60,14 +60,12 @@ class WebGlApp {
 
   void _redraw(time) {
     this._gl.clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
-    double fovYRadians = 30.0;
-    double aspectRatio = 1.0;
+    double fovYRadians = 30.0 * degrees2Radians;
+    double aspectRatio = this._canvas.width / this._canvas.height;
     double zNear = 1.0;
     double zFar = 100.0;
     Matrix4 m = makePerspectiveMatrix(fovYRadians,
-        this._canvas.width / this._canvas.height, zNear, zFar);
-
-    m = createPerspectiveMatrix(fovYRadians, zNear, zFar);
+        aspectRatio, zNear, zFar);
 
     Vector3 cameraPosition = new Vector3(18.0, 18.0, 18.0);
 
@@ -88,17 +86,6 @@ class WebGlApp {
           this._lightColor, this._lightDirection,
           this._ambientLightColor);
     }
-  }
-
-  Matrix4 createPerspectiveMatrix(double fov, double near, double far) {
-    double s = 1 / (Math.tan((fov / 2) * (3.1414 / 180)));
-
-    return new Matrix4.fromList([
-      s, 0.0, 0.0, 0.0,
-      0.0, s, 0.0, 0.0,
-      0.0, 0.0, -far / (far - near), -1.0,
-      0.0, 0.0, -(far * near) / (far - near), 0.0
-    ]);
   }
 
   Element getElement() {
