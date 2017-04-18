@@ -18,6 +18,7 @@ Program createProgram(RenderingContext gl,
   gl.attachShader(program, vShader);
   gl.attachShader(program, fShader);
   gl.linkProgram(program);
+  print(gl.getProgramInfoLog(program));
   return program;
 }
 
@@ -35,25 +36,34 @@ class Cube {
   static Program _program;
 
   static const String vshader = """
+#ifdef GL_ES
+precision mediump float;
+#endif
+
 attribute vec4 a_Position;
 attribute vec4 a_Color;
 attribute vec4 a_Normal;
-uniform vec3 u_AmbientLightColor;
-uniform vec3 u_LightColor;
-uniform vec3 u_LightDirection;
+
+//uniform vec3 u_AmbientLightColor;
+//uniform vec3 u_LightDirection;
+
 uniform mat4 u_ViewMatrix;
 uniform mat4 u_ModelMatrix;
 uniform mat4 u_NormalMatrix;
+
+varying vec3 v_Normal;
+varying vec3 v_Position;
 varying vec4 v_Color;
+
+
 void main() {
   gl_Position = (u_ViewMatrix * u_ModelMatrix) * a_Position;
 
-  vec3 normal = normalize(vec3(u_NormalMatrix * a_Normal));
+  v_Position = vec3(u_ModelMatrix * a_Position);
 
-  float nDotL = max(dot(u_LightDirection, normal), 0.0);
-  vec3 diffuse = u_LightColor * a_Color.rgb * nDotL;
-  vec3 ambient = u_AmbientLightColor * a_Color.rgb;
-  v_Color = vec4(diffuse + ambient, a_Color.a);
+  v_Normal = normalize(vec3(u_NormalMatrix * a_Normal));
+
+  v_Color = a_Color;
 }
 """;
 
@@ -61,9 +71,26 @@ void main() {
 #ifdef GL_ES
 precision mediump float;
 #endif
+uniform vec3 u_LightColor;
+uniform vec3 u_LightPosition;
+uniform vec3 u_AmbientLight;
+
+varying vec3 v_Normal;
+varying vec3 v_Position;
 varying vec4 v_Color;
+
 void main() {
-  gl_FragColor = v_Color;
+  vec3 normal = normalize(v_Normal);
+
+  vec3 lightDirection = normalize(u_LightPosition - v_Position);
+
+  float d = max(dot(lightDirection, normal), 0.0);
+
+  vec3 diffuse = u_LightColor * v_Color.rgb * d;
+
+  vec3 ambient = u_AmbientLight * v_Color.rgb;
+
+  gl_FragColor = vec4(diffuse + ambient, v_Color.a) + (vec4(0.0001 * u_LightColor, 0.0));
 }
 """;
 
@@ -104,7 +131,7 @@ void main() {
   }
 
   void _setAmbientLightColor(Vector3 ambientLightColor) {
-    gl.uniform3fv(this._u('u_AmbientLightColor'),
+    gl.uniform3fv(this._u('u_AmbientLight'),
         ambientLightColor.storage);
   }
 
@@ -125,10 +152,12 @@ void main() {
   }
 
   void draw(Matrix4 mvp, time, Vector3 lightColor,
-      Vector3 lightDirection, Vector3 ambientLightColor) {
+      Vector3 lightDirection, Vector3 ambientLightColor,
+      Vector3 lightPosition) {
 
     gl.uniform3fv(this._u('u_LightColor'), lightColor.storage);
-    gl.uniform3fv(this._u('u_LightDirection'), lightDirection.storage);
+    //gl.uniform3fv(this._u('u_LightDirection'), lightDirection.storage);
+    gl.uniform3fv(this._u('u_LightPosition'), lightPosition.storage);
     this._setAmbientLightColor(ambientLightColor);
 
     gl.useProgram(this.program);

@@ -81,10 +81,12 @@ class WebGlApp {
 
     this._lightDirection.normalize();
 
+    final Vector3 lightPosition = new Vector3(10.0, 10.0, 10.0);
+
     for (var obj in this._scene) {
       obj.draw(mvp, time,
           this._lightColor, this._lightDirection,
-          this._ambientLightColor);
+          this._ambientLightColor, lightPosition);
     }
   }
 
