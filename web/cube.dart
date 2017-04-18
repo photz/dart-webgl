@@ -43,7 +43,7 @@ uniform mat4 u_ViewMatrix;
 uniform mat4 u_ModelMatrix;
 varying vec4 v_Color;
 void main() {
-  gl_Position = (u_ViewMatrix * u_ModelMatrix) * a_Position;;
+  gl_Position = (u_ViewMatrix * u_ModelMatrix) * a_Position;
 
   vec3 normal = normalize(a_Normal.xyz);
   float nDotL = max(dot(u_LightDirection, normal), 0.0);
