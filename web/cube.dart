@@ -71,7 +71,7 @@ void main() {
   Program get program => _program;
   int _x;
   int _y;
-  double _angle = 0;
+  double _angle = 0.0;
   
   int get x => _x;
   int get y => _y;
