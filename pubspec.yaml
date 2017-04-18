@@ -2,6 +2,7 @@ name: webgltest
 description: Trying to use WebGL with Dart
 dependencies:
   vector_math: any
+  test: any
 transformers:
 -  $dart2js:
      commandLineOptions: [--enable-experimental-mirrors]				
