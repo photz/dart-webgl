@@ -1,6 +1,8 @@
 import 'package:vector_math/vector_math.dart';
 import 'dart:typed_data';
 import 'dart:web_gl';
+import 'dart:math' as Math;
+
 
 Program createProgram(RenderingContext gl,
     String vShaderSource, String fShaderSource) {
@@ -41,11 +43,13 @@ uniform vec3 u_LightColor;
 uniform vec3 u_LightDirection;
 uniform mat4 u_ViewMatrix;
 uniform mat4 u_ModelMatrix;
+uniform mat4 u_NormalMatrix;
 varying vec4 v_Color;
 void main() {
   gl_Position = (u_ViewMatrix * u_ModelMatrix) * a_Position;
 
-  vec3 normal = normalize(a_Normal.xyz);
+  vec3 normal = normalize(vec3(u_NormalMatrix * a_Normal));
+
   float nDotL = max(dot(u_LightDirection, normal), 0.0);
   vec3 diffuse = u_LightColor * a_Color.rgb * nDotL;
   vec3 ambient = u_AmbientLightColor * a_Color.rgb;
@@ -67,9 +71,11 @@ void main() {
   Program get program => _program;
   int _x;
   int _y;
-
+  double _angle = 0;
+  
   int get x => _x;
   int get y => _y;
+  double get angle => _angle;
 
   Vector3 getWorldCoordinates() {
     double multiplier = 2.0;
@@ -78,6 +84,10 @@ void main() {
         0.0, this._y * multiplier);
 
     return worldCoordinates;
+  }
+
+  void setAngle(double newAngle) {
+    this._angle = newAngle;
   }
 
   Cube.create(RenderingContext gl, int x, int y) {
@@ -135,10 +145,21 @@ void main() {
     
     Matrix4 modelMatrix = new Matrix4.translation(worldCoordinates);
 
+    modelMatrix.rotateY(this._angle);
+
     this.gl.uniformMatrix4fv(this._u('u_ModelMatrix'),
         false,
         modelMatrix.storage);
 
+
+    Matrix4 normalMatrix = new Matrix4.inverted(modelMatrix);
+    normalMatrix.transpose();
+
+    UniformLocation u_NormalMatrix = this._u('u_NormalMatrix');
+
+    this.gl.uniformMatrix4fv(u_NormalMatrix,
+        false,
+        normalMatrix.storage);
 
     this.gl.drawElements(TRIANGLES, 36, UNSIGNED_BYTE, 0);
   }
