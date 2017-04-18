@@ -81,6 +81,8 @@ class WebGlApp {
 
     Matrix4 mvp = m * v;
 
+    this._lightDirection.normalize();
+
     for (var obj in this._scene) {
       obj.draw(mvp, time,
           this._lightColor, this._lightDirection,
