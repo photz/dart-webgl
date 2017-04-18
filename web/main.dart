@@ -71,7 +71,7 @@ class WebGlApp {
 
     Vector3 cameraPosition = new Vector3(18.0, 18.0, 18.0);
 
-    Vector3 cameraFocusPosition = new Vector3(0.0, 0.0, 0.0);
+    Vector3 cameraFocusPosition = this._scene.first.getWorldCoordinates();
 
     Vector3 upDirection = new Vector3(0.0, 1.0, 0.0);
 

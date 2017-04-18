@@ -70,6 +70,15 @@ void main() {
   int get x => _x;
   int get y => _y;
 
+  Vector3 getWorldCoordinates() {
+    double multiplier = 2.0;
+
+    Vector3 worldCoordinates = new Vector3(this._x * multiplier,
+        0.0, this._y * multiplier);
+
+    return worldCoordinates;
+  }
+
   Cube.create(RenderingContext gl, int x, int y) {
     if (_gl == null) {
       _gl = gl;
@@ -121,11 +130,9 @@ void main() {
         false,
         viewMatrix.storage);
 
-
-    double multiplier = 2.0;
-
-    Matrix4 modelMatrix = new Matrix4.translationValues(
-        this._x * multiplier, 0.0, this._y * multiplier);
+    Vector3 worldCoordinates = this.getWorldCoordinates();
+    
+    Matrix4 modelMatrix = new Matrix4.translation(worldCoordinates);
 
     this.gl.uniformMatrix4fv(this._u('u_ModelMatrix'),
         false,
