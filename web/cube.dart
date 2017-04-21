@@ -126,9 +126,7 @@ void main() {
       _gl = gl;
       _program = createProgram(_gl, vshader, fshader);
       _gl.useProgram(program);
-      //_initVertexBuffers(gl, program);
-      //_initNormalsBuffer(gl, program);
-          Model m = new Model.fromObj("""
+      Model m = new Model.fromObj("""
 # cube.obj
 #
  
@@ -164,9 +162,8 @@ f  2//1  6//1  8//1
 f  2//1  8//1  4//1 
 """);
           this._load(m);
-          //this._loadVertices(m);
-          //this._loadFaces(m);
     }
+
 
     this._x = x;
     this._y = y;
@@ -199,7 +196,6 @@ f  2//1  8//1  4//1
 
     gl.uniform3fv(this._u('u_Color'), this._color.storage);
     gl.uniform3fv(this._u('u_LightColor'), lightColor.storage);
-    //gl.uniform3fv(this._u('u_LightDirection'), lightDirection.storage);
     gl.uniform3fv(this._u('u_LightPosition'), lightPosition.storage);
     this._setAmbientLightColor(ambientLightColor);
 
@@ -233,8 +229,6 @@ f  2//1  8//1  4//1
         false,
         normalMatrix.storage);
 
-    //this.gl.drawElements(TRIANGLES, 20 * 3, UNSIGNED_BYTE, 0);
-
     this.gl.drawArrays(TRIANGLES, 0, 6 * 2 * 3);
   }
 
@@ -247,88 +241,6 @@ f  2//1  8//1  4//1
     }
 
     return attribLocation;
-  }
-
-  static void _initVertexBuffers(RenderingContext gl, Program program) {
-
-    final Float32List verticesColors = new Float32List.fromList([
-      1.0,  1.0,  1.0,     1.0,  1.0,  1.0,  // v0 White
-        -1.0,  1.0,  1.0,     1.0,  0.0,  1.0,  // v1 Magenta
-        -1.0, -1.0,  1.0,     1.0,  0.0,  0.0,  // v2 Red
-      1.0, -1.0,  1.0,     1.0,  1.0,  0.0,  // v3 Yellow
-      1.0, -1.0, -1.0,     0.0,  1.0,  0.0,  // v4 Green
-      1.0,  1.0, -1.0,     0.0,  1.0,  1.0,  // v5 Cyan
-        -1.0,  1.0, -1.0,     0.0,  0.0,  1.0,  // v6 Blue
-        -1.0, -1.0, -1.0,     0.0,  0.0,  0.0   // v7 Black
-    ]);
-
-    final Buffer vertexColorBuffer = gl.createBuffer();
-    gl.bindBuffer(ARRAY_BUFFER, vertexColorBuffer);
-    gl.bufferData(ARRAY_BUFFER, verticesColors, STATIC_DRAW);
-
-    // a_Position
-    final int a_Position = gl.getAttribLocation(program, 'a_Position');
-    gl.vertexAttribPointer(a_Position,
-        3,
-        FLOAT,
-        false,
-        6 * Float32List.BYTES_PER_ELEMENT,
-        0);
-    gl.enableVertexAttribArray(a_Position);
-
-    // a_Color
-    final int a_Color = gl.getAttribLocation(program, 'a_Color');
-    gl.vertexAttribPointer(a_Color,
-        3,
-        FLOAT,
-        false,
-        6 * Float32List.BYTES_PER_ELEMENT,
-        3 * Float32List.BYTES_PER_ELEMENT);
-    gl.enableVertexAttribArray(a_Color);
-
-    final Uint8List indices = new Uint8List.fromList([
-      0, 1, 2,   0, 2, 3,    // front
-      0, 3, 4,   0, 4, 5,    // right
-      0, 5, 6,   0, 6, 1,    // up
-      1, 6, 7,   1, 7, 2,    // left
-      7, 4, 3,   7, 3, 2,    // down
-      4, 7, 6,   4, 6, 5     // back
-    ]);
-    final Buffer indexBuffer = gl.createBuffer();
-    gl.bindBuffer(ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(ELEMENT_ARRAY_BUFFER, indices, STATIC_DRAW);
-
-  }
-
-
-  static void _initNormalsBuffer(RenderingContext gl, Program program) {
-    final Float32List normals = new Float32List.fromList([
-    0.0, 0.0, 1.0,   0.0, 0.0, 1.0,   0.0, 0.0, 1.0,   0.0, 0.0, 1.0,  // v0-v1-v2-v3 front
-    1.0, 0.0, 0.0,   1.0, 0.0, 0.0,   1.0, 0.0, 0.0,   1.0, 0.0, 0.0,  // v0-v3-v4-v5 right
-    0.0, 1.0, 0.0,   0.0, 1.0, 0.0,   0.0, 1.0, 0.0,   0.0, 1.0, 0.0,  // v0-v5-v6-v1 up
-   -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,  // v1-v6-v7-v2 left
-    0.0,-1.0, 0.0,   0.0,-1.0, 0.0,   0.0,-1.0, 0.0,   0.0,-1.0, 0.0,  // v7-v4-v3-v2 down
-    0.0, 0.0,-1.0,   0.0, 0.0,-1.0,   0.0, 0.0,-1.0,   0.0, 0.0,-1.0,   // v4-v7-v6-v5 back
-    ]);
-
-    final Buffer normalsBuffer = gl.createBuffer();
-
-    final int a_Normal = gl.getAttribLocation(program, 'a_Normal');
-
-    gl.bindBuffer(ARRAY_BUFFER, normalsBuffer);
-
-    gl.bufferData(ARRAY_BUFFER, normals, STATIC_DRAW);
-
-    gl.vertexAttribPointer(a_Normal,
-        3,
-        FLOAT,
-        false,
-        0,
-        0);
-
-    gl.enableVertexAttribArray(a_Normal);
-
-    gl.bindBuffer(ARRAY_BUFFER, null);
   }
 
   void _load(Model model) {
