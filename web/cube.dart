@@ -47,6 +47,7 @@ attribute vec4 a_Normal;
 //uniform vec3 u_AmbientLightColor;
 //uniform vec3 u_LightDirection;
 
+uniform vec3 u_Color;
 uniform mat4 u_ViewMatrix;
 uniform mat4 u_ModelMatrix;
 uniform mat4 u_NormalMatrix;
@@ -63,7 +64,7 @@ void main() {
 
   v_Normal = normalize(vec3(u_NormalMatrix * a_Normal));
 
-  v_Color = vec4(1.0, 0.0, 0.0, 1.0);
+  v_Color = vec4(u_Color, 1.0);
 }
 """;
 
@@ -99,6 +100,7 @@ void main() {
   int _x;
   int _y;
   double _angle = 0.0;
+  Vector3 _color;
   
   int get x => _x;
   int get y => _y;
@@ -117,7 +119,9 @@ void main() {
     this._angle = newAngle;
   }
 
-  Cube.create(RenderingContext gl, int x, int y) {
+  Cube.create(RenderingContext gl, int x, int y, Vector3 color)
+    : _color = color {
+
     if (_gl == null) {
       _gl = gl;
       _program = createProgram(_gl, vshader, fshader);
@@ -193,6 +197,7 @@ f  2//1  8//1  4//1
       Vector3 lightDirection, Vector3 ambientLightColor,
       Vector3 lightPosition) {
 
+    gl.uniform3fv(this._u('u_Color'), this._color.storage);
     gl.uniform3fv(this._u('u_LightColor'), lightColor.storage);
     //gl.uniform3fv(this._u('u_LightDirection'), lightDirection.storage);
     gl.uniform3fv(this._u('u_LightPosition'), lightPosition.storage);

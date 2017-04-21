@@ -31,10 +31,14 @@ class WebGlApp {
 
     document.body.onKeyDown.listen(this._onKeyDown);
 
-    this.addObjectToScene(new Cube.create(this._gl, 1, 4));
-    this.addObjectToScene(new Cube.create(this._gl, 1, 3));
-    this.addObjectToScene(new Cube.create(this._gl, 2, 3));
-    this.addObjectToScene(new Cube.create(this._gl, 4, 1));
+    this.addObjectToScene(new Cube.create(this._gl, 1, 4,
+            new Vector3(1.0, 0.0, 0.0)));
+    this.addObjectToScene(new Cube.create(this._gl, 1, 3,
+            new Vector3(0.0, 1.0, 0.0)));
+    this.addObjectToScene(new Cube.create(this._gl, 2, 3,
+            new Vector3(0.0, 0.0, 1.0)));
+    this.addObjectToScene(new Cube.create(this._gl, 4, 1,
+            new Vector3(1.0, 0.0, 1.0)));
     //this.addObjectToScene(new Pyramid(this._gl));
 
     this._gl.enable(DEPTH_TEST);
