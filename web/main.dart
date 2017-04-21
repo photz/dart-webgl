@@ -4,7 +4,6 @@ import 'dart:html';
 import 'dart:web_gl';
 import 'web_gl_debug.dart';
 import 'cube.dart';
-import 'pyramid.dart';
 import 'dart:math' as Math;
 
 
