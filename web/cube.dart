@@ -107,7 +107,7 @@ void main() {
   double get angle => _angle;
 
   Vector3 getWorldCoordinates() {
-    double multiplier = 2.0;
+    double multiplier = 1.0;
 
     Vector3 worldCoordinates = new Vector3(this._x * multiplier,
         0.0, this._y * multiplier);
