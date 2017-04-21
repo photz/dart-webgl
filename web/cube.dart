@@ -2,7 +2,7 @@ import 'package:vector_math/vector_math.dart';
 import 'dart:typed_data';
 import 'dart:web_gl';
 import 'dart:math' as Math;
-
+import 'model.dart';
 
 Program createProgram(RenderingContext gl,
     String vShaderSource, String fShaderSource) {
@@ -41,7 +41,7 @@ precision mediump float;
 #endif
 
 attribute vec4 a_Position;
-attribute vec4 a_Color;
+//attribute vec4 a_Color;
 attribute vec4 a_Normal;
 
 //uniform vec3 u_AmbientLightColor;
@@ -63,7 +63,7 @@ void main() {
 
   v_Normal = normalize(vec3(u_NormalMatrix * a_Normal));
 
-  v_Color = a_Color;
+  v_Color = vec4(1.0, 0.0, 0.0, 1.0);
 }
 """;
 
@@ -90,7 +90,7 @@ void main() {
 
   vec3 ambient = u_AmbientLight * v_Color.rgb;
 
-  gl_FragColor = vec4(diffuse + ambient, v_Color.a) + (vec4(0.0001 * u_LightColor, 0.0));
+  gl_FragColor = vec4(diffuse + ambient, v_Color.a) + (vec4(0.1 * u_LightColor, 0.0));
 }
 """;
 
@@ -122,8 +122,46 @@ void main() {
       _gl = gl;
       _program = createProgram(_gl, vshader, fshader);
       _gl.useProgram(program);
-      _initVertexBuffers(gl, program);
-      _initNormalsBuffer(gl, program);
+      //_initVertexBuffers(gl, program);
+      //_initNormalsBuffer(gl, program);
+          Model m = new Model.fromObj("""
+# cube.obj
+#
+ 
+g cube
+ 
+v  0.0  0.0  0.0
+v  0.0  0.0  1.0
+v  0.0  1.0  0.0
+v  0.0  1.0  1.0
+v  1.0  0.0  0.0
+v  1.0  0.0  1.0
+v  1.0  1.0  0.0
+v  1.0  1.0  1.0
+
+vn  0.0  0.0  1.0
+vn  0.0  0.0 -1.0
+vn  0.0  1.0  0.0
+vn  0.0 -1.0  0.0
+vn  1.0  0.0  0.0
+vn -1.0  0.0  0.0
+ 
+f  1//2  7//2  5//2
+f  1//2  3//2  7//2
+f  1//6  4//6  3//6   
+f  1//6  2//6  4//6
+f  3//3  8//3  7//3
+f  3//3  4//3  8//3
+f  5//5  7//5  8//5
+f  5//5  8//5  6//5
+f  1//4  5//4  6//4
+f  1//4  6//4  2//4
+f  2//1  6//1  8//1
+f  2//1  8//1  4//1 
+""");
+          this._load(m);
+          //this._loadVertices(m);
+          //this._loadFaces(m);
     }
 
     this._x = x;
@@ -190,7 +228,20 @@ void main() {
         false,
         normalMatrix.storage);
 
-    this.gl.drawElements(TRIANGLES, 36, UNSIGNED_BYTE, 0);
+    //this.gl.drawElements(TRIANGLES, 20 * 3, UNSIGNED_BYTE, 0);
+
+    this.gl.drawArrays(TRIANGLES, 0, 6 * 2 * 3);
+  }
+
+  int _a(String attribName) {
+    final int attribLocation = gl.getAttribLocation(_program,
+        attribName);
+
+    if (-1 == attribLocation) {
+      throw new Exception('no such attribute: ' + attribName);
+    }
+
+    return attribLocation;
   }
 
   static void _initVertexBuffers(RenderingContext gl, Program program) {
@@ -273,5 +324,31 @@ void main() {
     gl.enableVertexAttribArray(a_Normal);
 
     gl.bindBuffer(ARRAY_BUFFER, null);
+  }
+
+  void _load(Model model) {
+    Float32List positionsNormals = model.positionsAndNormalsToArr();
+
+    Buffer buffer = gl.createBuffer();
+
+    gl.bindBuffer(ARRAY_BUFFER, buffer);
+    gl.bufferData(ARRAY_BUFFER, positionsNormals, STATIC_DRAW);
+
+    gl.vertexAttribPointer(this._a('a_Position'),
+        3,
+        FLOAT,
+        false,
+        6 * Float32List.BYTES_PER_ELEMENT,
+        0);
+    gl.enableVertexAttribArray(this._a('a_Position'));
+
+    gl.vertexAttribPointer(this._a('a_Normal'),
+        3,
+        FLOAT,
+        false,
+        6 * Float32List.BYTES_PER_ELEMENT,
+        3 * Float32List.BYTES_PER_ELEMENT);
+    gl.enableVertexAttribArray(this._a('a_Normal'));
+
   }
 }
