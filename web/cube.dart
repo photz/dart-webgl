@@ -35,66 +35,6 @@ class Cube {
   static RenderingContext _gl;
   static Program _program;
 
-  static const String vshader = """
-#ifdef GL_ES
-precision mediump float;
-#endif
-
-attribute vec4 a_Position;
-//attribute vec4 a_Color;
-attribute vec4 a_Normal;
-
-//uniform vec3 u_AmbientLightColor;
-//uniform vec3 u_LightDirection;
-
-uniform vec3 u_Color;
-uniform mat4 u_ViewMatrix;
-uniform mat4 u_ModelMatrix;
-uniform mat4 u_NormalMatrix;
-
-varying vec3 v_Normal;
-varying vec3 v_Position;
-varying vec4 v_Color;
-
-
-void main() {
-  gl_Position = (u_ViewMatrix * u_ModelMatrix) * a_Position;
-
-  v_Position = vec3(u_ModelMatrix * a_Position);
-
-  v_Normal = normalize(vec3(u_NormalMatrix * a_Normal));
-
-  v_Color = vec4(u_Color, 1.0);
-}
-""";
-
-  static const String fshader = """
-#ifdef GL_ES
-precision mediump float;
-#endif
-uniform vec3 u_LightColor;
-uniform vec3 u_LightPosition;
-uniform vec3 u_AmbientLight;
-
-varying vec3 v_Normal;
-varying vec3 v_Position;
-varying vec4 v_Color;
-
-void main() {
-  vec3 normal = normalize(v_Normal);
-
-  vec3 lightDirection = normalize(u_LightPosition - v_Position);
-
-  float d = max(dot(lightDirection, normal), 0.0);
-
-  vec3 diffuse = u_LightColor * v_Color.rgb * d;
-
-  vec3 ambient = u_AmbientLight * v_Color.rgb;
-
-  gl_FragColor = vec4(diffuse + ambient, v_Color.a) + (vec4(0.1 * u_LightColor, 0.0));
-}
-""";
-
   RenderingContext get gl => _gl;
   Program get program => _program;
   int _x;
@@ -124,6 +64,8 @@ void main() {
 
     if (_gl == null) {
       _gl = gl;
+      String vshader = myLoadShader('cube.vert');
+      String fshader = myLoadShader('cube.frag');
       _program = createProgram(_gl, vshader, fshader);
       _gl.useProgram(program);
       Model m = new Model.fromObj("""
@@ -161,9 +103,10 @@ f  1//4  6//4  2//4
 f  2//1  6//1  8//1
 f  2//1  8//1  4//1 
 """);
-          this._load(m);
-    }
 
+
+      this._load(m);
+    }
 
     this._x = x;
     this._y = y;
@@ -211,6 +154,7 @@ f  2//1  8//1  4//1
 
     Vector3 worldCoordinates = this.getWorldCoordinates();
     
+    worldCoordinates = worldCoordinates - new Vector3(-0.5, 0.5, -0.5);
     Matrix4 modelMatrix = new Matrix4.translation(worldCoordinates);
 
     modelMatrix.rotateY(this._angle);
