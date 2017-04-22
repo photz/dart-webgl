@@ -1,11 +1,11 @@
-
+import 'package:path/path.dart' as path;
 import 'package:analyzer/analyzer.dart';
 import 'package:analyzer/src/generated/ast.dart';
 import 'package:analyzer/src/generated/error.dart';
 import 'package:analyzer/src/generated/parser.dart';
 import 'package:analyzer/src/generated/scanner.dart';
 import 'package:barback/barback.dart';
-
+import 'dart:io';
 import 'dart:async';
 
 class ShaderLoader extends Transformer {
@@ -17,9 +17,6 @@ class ShaderLoader extends Transformer {
 
   Future apply(Transform transform) async {
 
-
-
-
     var content = await transform.primaryInput.readAsString();
 
     CompilationUnit c = parseCompilationUnit(content);
@@ -27,8 +24,6 @@ class ShaderLoader extends Transformer {
     c.accept(new MyAstVisitor());
 
     var id = transform.primaryInput.id;
-
-    
 
     transform.addOutput(new Asset.fromString(id, c.toSource()));
   }
@@ -38,8 +33,19 @@ class MyAstVisitor extends RecursiveAstVisitor {
   @override
   void visitMethodInvocation(node) {
     if ('myLoadShader' == node.methodName.token.lexeme) {
-      const String replacement = '"""FOOBAR"""';
 
+
+      var args = new List.from(node.childEntities);
+
+      var x = args[1].arguments;
+
+      String fileName = x.first.stringValue;
+
+      final File f = new File('./shaders/' + fileName);
+
+      final String contents = f.readAsStringSync();
+
+      final String replacement = '"""${contents}"""';
 
       SimpleStringLiteral ssl = createSimpleStringLiteral(node,
                                                           replacement);
