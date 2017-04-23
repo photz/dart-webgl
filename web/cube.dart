@@ -3,32 +3,7 @@ import 'dart:typed_data';
 import 'dart:web_gl';
 import 'dart:math' as Math;
 import 'model.dart';
-
-Program createProgram(RenderingContext gl,
-    String vShaderSource, String fShaderSource) {
-
-  Shader vShader = loadShader(gl, RenderingContext.VERTEX_SHADER,
-      vShaderSource);
-
-  Shader fShader = loadShader(gl, RenderingContext.FRAGMENT_SHADER,
-      fShaderSource);
-
-  Program program = gl.createProgram();
-
-  gl.attachShader(program, vShader);
-  gl.attachShader(program, fShader);
-  gl.linkProgram(program);
-  print(gl.getProgramInfoLog(program));
-  return program;
-}
-
-Shader loadShader(RenderingContext gl, int type, String source) {
-  Shader shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  print(gl.getShaderInfoLog(shader));
-  return shader;
-}
+import 'utils.dart';
 
 class Cube {
 
