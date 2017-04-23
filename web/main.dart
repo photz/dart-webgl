@@ -107,7 +107,7 @@ class WebGlApp {
   void _onKeyDown(KeyboardEvent e) {
     var player = this._scene.first;
 
-    double angle = 3.1414 / 10;
+    double angle = Math.PI / 10;
 
     switch (e.keyCode) {
       case KeyCode.LEFT:
