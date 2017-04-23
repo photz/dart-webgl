@@ -22,19 +22,6 @@ class Cube {
   int get y => _y;
   double get angle => _angle;
 
-  Vector3 getWorldCoordinates() {
-    double multiplier = 1.0;
-
-    Vector3 worldCoordinates = new Vector3(this._x * multiplier,
-        0.0, this._y * multiplier);
-
-    return worldCoordinates;
-  }
-
-  void setAngle(double newAngle) {
-    this._angle = newAngle;
-  }
-
   Cube.create(RenderingContext gl, int x, int y, Vector3 color)
     : _color = color {
 
@@ -87,6 +74,21 @@ f  2//1  8//1  4//1
     this._x = x;
     this._y = y;
   }
+
+
+  Vector3 getWorldCoordinates() {
+    double multiplier = 1.0;
+
+    Vector3 worldCoordinates = new Vector3(this._x * multiplier,
+        0.0, this._y * multiplier);
+
+    return worldCoordinates;
+  }
+
+  void setAngle(double newAngle) {
+    this._angle = newAngle;
+  }
+
 
   void _setAmbientLightColor(Vector3 ambientLightColor) {
     gl.uniform3fv(this._u('u_AmbientLight'),
