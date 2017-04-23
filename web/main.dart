@@ -6,6 +6,7 @@ import 'web_gl_debug.dart';
 import 'package:webgltest/cube.dart';
 import 'dart:math' as Math;
 import 'package:webgltest/grid.dart';
+import 'package:webgltest/sphere.dart';
 
 class WebGlApp {
   CanvasElement _canvas;
@@ -35,6 +36,8 @@ class WebGlApp {
 
     this._grid = new Grid.create(this._gl);
 
+    this.addObjectToScene(new MySphere.create(this._gl, 5, 5,
+            new Vector3(1.0, 1.0, 0.0)));
     this.addObjectToScene(new Cube.create(this._gl, 1, 4,
             new Vector3(1.0, 0.0, 0.0)));
     this.addObjectToScene(new Cube.create(this._gl, 1, 3,
