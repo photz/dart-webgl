@@ -3,9 +3,9 @@ import 'dart:typed_data';
 import 'dart:html';
 import 'dart:web_gl';
 import 'web_gl_debug.dart';
-import 'cube.dart';
+import 'package:webgltest/cube.dart';
 import 'dart:math' as Math;
-import 'grid.dart';
+import 'package:webgltest/grid.dart';
 
 class WebGlApp {
   CanvasElement _canvas;
