@@ -63,7 +63,7 @@ class Grid {
 
   Float32List _generateGrid(int rows, int columns) {
 
-    List<double> triangleData = [];
+    List<int> triangleData = [];
 
     for (int row = 0; row < rows; row++) {
 
@@ -71,16 +71,16 @@ class Grid {
 
         // first triangle
         triangleData.addAll([
-          col, row, 0.0,
-          col + 1, row, 0.0,
-          col, row + 1, 0.0
+          col, row, 0,
+          col + 1, row, 0,
+          col, row + 1, 0
         ]);
 
         // second triangle
         triangleData.addAll([
-          col + 1, row, 0.0,
-          col + 1, row + 1, 0.0,
-          col, row + 1, 0.0
+          col + 1, row, 0,
+          col + 1, row + 1, 0,
+          col, row + 1, 0
         ]);
       }
 
