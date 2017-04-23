@@ -9,15 +9,15 @@ import 'dart:io';
 import 'dart:async';
 
 class ShaderLoader extends Transformer {
-  ShaderLoader.asPlugin() {
-
-  }
+  ShaderLoader.asPlugin();
 
   Future<bool> isPrimary(AssetId id) async => id.extension == '.dart';
 
   Future apply(Transform transform) async {
 
-    var content = await transform.primaryInput.readAsString();
+    final Asset asset = transform.primaryInput;
+
+    var content = await asset.readAsString();
 
     CompilationUnit c = parseCompilationUnit(content);
 
@@ -32,25 +32,29 @@ class ShaderLoader extends Transformer {
 class MyAstVisitor extends RecursiveAstVisitor {
   @override
   void visitMethodInvocation(node) {
-    if ('myLoadShader' == node.methodName.token.lexeme) {
+    switch (node.methodName.token.lexeme) {
+      case 'myLoadShader':
+        var args = new List.from(node.childEntities);
 
+        var arguments = args[1].arguments;
 
-      var args = new List.from(node.childEntities);
+        String fileName = arguments.first.stringValue;
 
-      var x = args[1].arguments;
+        const String shadersDir = 'shaders';
 
-      String fileName = x.first.stringValue;
+        String filePath = path.join(shadersDir, fileName);
 
-      final File f = new File('./shaders/' + fileName);
+        final File file = new File(filePath);
 
-      final String contents = f.readAsStringSync();
+        String contents = file.readAsStringSync();
 
-      final String replacement = '"""${contents}"""';
+        final String replacement = '"""${contents}"""';
 
-      SimpleStringLiteral ssl = createSimpleStringLiteral(node,
-                                                          replacement);
+        SimpleStringLiteral ssl = createSimpleStringLiteral(node,
+            replacement);
 
-      node.parent.accept(new NodeReplacer(node, ssl));
+        node.parent.accept(new NodeReplacer(node, ssl));
+        break;
     }
   }
 }
