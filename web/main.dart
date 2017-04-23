@@ -5,7 +5,7 @@ import 'dart:web_gl';
 import 'web_gl_debug.dart';
 import 'cube.dart';
 import 'dart:math' as Math;
-
+import 'grid.dart';
 
 class WebGlApp {
   CanvasElement _canvas;
@@ -14,6 +14,7 @@ class WebGlApp {
   Vector3 _ambientLightColor;
   Vector3 _lightDirection;
   Vector3 _lightColor;
+  Grid _grid;
 
   WebGlApp(int width, int height) {
 
@@ -31,6 +32,8 @@ class WebGlApp {
 
     document.body.onKeyDown.listen(this._onKeyDown);
 
+    this._grid = new Grid.create(this._gl);
+
     this.addObjectToScene(new Cube.create(this._gl, 1, 4,
             new Vector3(1.0, 0.0, 0.0)));
     this.addObjectToScene(new Cube.create(this._gl, 1, 3,
@@ -46,6 +49,8 @@ class WebGlApp {
     this._ambientLightColor = new Vector3(0.05, 0.05, 0.05);
     this._lightDirection = new Vector3(0.5, 3.0, 4.0);
     this._lightColor = new Vector3(1.0, 1.0, 1.0);
+
+
   }
 
   void addObjectToScene(obj) {
@@ -85,6 +90,8 @@ class WebGlApp {
     this._lightDirection.normalize();
 
     final Vector3 lightPosition = new Vector3(10.0, 10.0, 10.0);
+
+    this._grid.draw(mvp, time);
 
     for (var obj in this._scene) {
       obj.draw(mvp, time,
