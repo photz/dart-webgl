@@ -10,6 +10,7 @@ class Cube {
 
   static RenderingContext _gl;
   static Program _program;
+  static Buffer _buffer;
 
   RenderingContext get gl => _gl;
   Program get program => _program;
@@ -68,7 +69,8 @@ f  2//1  8//1  4//1
 """);
 
 
-      this._load(m);
+      _buffer = this._fillBufferWithModelData(m);
+      this._setUpPointers();
     }
 
     this._x = x;
@@ -115,12 +117,15 @@ f  2//1  8//1  4//1
       Vector3 lightDirection, Vector3 ambientLightColor,
       Vector3 lightPosition) {
 
+    gl.useProgram(this.program);    
+
+    _setUpPointers();
+
     gl.uniform3fv(this._u('u_Color'), this._color.storage);
     gl.uniform3fv(this._u('u_LightColor'), lightColor.storage);
     gl.uniform3fv(this._u('u_LightPosition'), lightPosition.storage);
     this._setAmbientLightColor(ambientLightColor);
 
-    gl.useProgram(this.program);
     this._drawCube(mvp);
   }
 
@@ -165,7 +170,7 @@ f  2//1  8//1  4//1
     return attribLocation;
   }
 
-  void _load(Model model) {
+  Buffer _fillBufferWithModelData(Model model) {
     Float32List positionsNormals = model.positionsAndNormalsToArr();
 
     Buffer buffer = gl.createBuffer();
@@ -173,6 +178,11 @@ f  2//1  8//1  4//1
     gl.bindBuffer(ARRAY_BUFFER, buffer);
     gl.bufferData(ARRAY_BUFFER, positionsNormals, STATIC_DRAW);
 
+    return buffer;
+  }
+
+  void _setUpPointers() {
+    gl.bindBuffer(ARRAY_BUFFER, _buffer);
     gl.vertexAttribPointer(this._a('a_Position'),
         3,
         FLOAT,
@@ -188,6 +198,5 @@ f  2//1  8//1  4//1
         6 * Float32List.BYTES_PER_ELEMENT,
         3 * Float32List.BYTES_PER_ELEMENT);
     gl.enableVertexAttribArray(this._a('a_Normal'));
-
   }
 }
