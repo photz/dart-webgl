@@ -81,8 +81,10 @@ f  2//1  8//1  4//1
   Vector3 getWorldCoordinates() {
     double multiplier = 1.0;
 
-    Vector3 worldCoordinates = new Vector3(this._x * multiplier,
-        0.0, this._y * multiplier);
+    Vector3 worldCoordinates = new Vector3(
+        this._x * multiplier + 0.5,
+        0.5,
+        this._y * multiplier + 0.5);
 
     return worldCoordinates;
   }
@@ -136,8 +138,7 @@ f  2//1  8//1  4//1
         viewMatrix.storage);
 
     Vector3 worldCoordinates = this.getWorldCoordinates();
-    
-    worldCoordinates = worldCoordinates - new Vector3(-0.5, 0.5, -0.5);
+
     Matrix4 modelMatrix = new Matrix4.translation(worldCoordinates);
 
     modelMatrix.rotateY(this._angle);
