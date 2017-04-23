@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:web_gl';
 import 'dart:math' as Math;
 import 'model.dart';
+import 'package:webgltest/load_shader.dart';
 import 'utils.dart';
 
 class Cube {
