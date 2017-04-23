@@ -21,8 +21,7 @@ class Grid {
       _gl.useProgram(_program);
 
       _gridDataBuffer = _createBufferAndFillWithGridData();
-
-      
+      _setUpPointers();
     }
   }
 
@@ -35,18 +34,7 @@ class Grid {
         false,
         viewMatrix.storage);
 
-    _gl.bindBuffer(ARRAY_BUFFER, _gridDataBuffer);
-
-    _gl.enableVertexAttribArray(this._a('a_Coords'));
-
-    _gl.vertexAttribPointer(this._a('a_Coords'),
-        3,
-        FLOAT,
-        false,
-        0,
-        0);
-
-    _gl.enableVertexAttribArray(this._a('a_Coords'));
+    _setUpPointers();
 
     _gl.drawArrays(TRIANGLES, 0, nVertices);
   }
@@ -59,6 +47,8 @@ class Grid {
     Float32List gridData = _generateGrid(10, 10);
 
     _gl.bufferData(ARRAY_BUFFER, gridData, STATIC_DRAW);
+
+    return buffer;
   }
 
   Float32List _generateGrid(int rows, int columns) {
@@ -113,4 +103,18 @@ class Grid {
     return u;
   }
 
+  void _setUpPointers() {
+    _gl.bindBuffer(ARRAY_BUFFER, _gridDataBuffer);
+
+    _gl.enableVertexAttribArray(this._a('a_Coords'));
+
+    _gl.vertexAttribPointer(this._a('a_Coords'),
+        3,
+        FLOAT,
+        false,
+        0,
+        0);
+
+    _gl.enableVertexAttribArray(this._a('a_Coords'));
+  }
 }
