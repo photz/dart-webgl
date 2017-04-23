@@ -15,6 +15,7 @@ class WebGlApp {
   Vector3 _lightDirection;
   Vector3 _lightColor;
   Grid _grid;
+  bool _running = false;
 
   WebGlApp(int width, int height) {
 
@@ -49,21 +50,18 @@ class WebGlApp {
     this._ambientLightColor = new Vector3(0.05, 0.05, 0.05);
     this._lightDirection = new Vector3(0.5, 3.0, 4.0);
     this._lightColor = new Vector3(1.0, 1.0, 1.0);
-
-
   }
 
   void addObjectToScene(obj) {
     this._scene.add(obj);
   }
 
-  void startLoop() {
-    window.animationFrame.then(this._loop);
-  }
-
-  void _loop(x) {
-    this._redraw(x);
-    window.animationFrame.then(this._loop);
+  startLoop() async {
+    _running = true;
+    while (_running) {
+      var time = await window.animationFrame;
+      this._redraw(time);
+    }
   }
 
   void _redraw(time) {
@@ -131,6 +129,13 @@ class WebGlApp {
         break;
       case KeyCode.E:
         player.setAngle(player.angle - angle);
+        break;
+
+      case KeyCode.P:
+        this._running = !this._running;
+        if (this._running) {
+          this.startLoop();
+        }
         break;
     }
   }
