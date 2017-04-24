@@ -8,6 +8,11 @@ import 'dart:math' as Math;
 import 'package:webgltest/grid.dart';
 import 'package:webgltest/sphere.dart';
 
+enum ViewMode {
+  FIRST_PERSON,
+  THIRD_PERSON
+}
+
 class WebGlApp {
   CanvasElement _canvas;
   RenderingContext _gl;
@@ -17,6 +22,7 @@ class WebGlApp {
   Vector3 _lightColor;
   Grid _grid;
   bool _running = false;
+  ViewMode _viewMode = ViewMode.FIRST_PERSON;
 
   WebGlApp(int width, int height) {
 
@@ -67,6 +73,43 @@ class WebGlApp {
     }
   }
 
+  Matrix4 _getViewMatrix() {
+    Vector3 cameraPosition;
+    Vector3 cameraFocusPosition;
+
+    switch (this._viewMode) {
+
+      case ViewMode.FIRST_PERSON:
+
+        Vector3 playerCoords = this._scene.first.getWorldCoordinates();
+
+        cameraPosition = playerCoords;
+
+        Matrix4 mat = new Matrix4
+          .rotationY(this._scene.first.angle);
+
+        Vector4 testVec = new Vector4(1.0, 0.0, 0.0, 0.0);
+
+        testVec = mat * testVec;
+
+        cameraFocusPosition = playerCoords + testVec.xyz;
+        break;
+        
+      case ViewMode.THIRD_PERSON:
+        cameraPosition = new Vector3(18.0, 18.0, 18.0);
+        cameraFocusPosition = this._scene.first.getWorldCoordinates();
+        break;
+    }
+
+    Vector3 upDirection = new Vector3(0.0, 1.0, 0.0);
+
+    Matrix4 v = makeViewMatrix(cameraPosition,
+        cameraFocusPosition,
+        upDirection);
+
+    return v;
+  }
+
   void _redraw(time) {
     this._gl.clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
     double fovYRadians = 30.0 * degrees2Radians;
@@ -76,17 +119,7 @@ class WebGlApp {
     Matrix4 m = makePerspectiveMatrix(fovYRadians,
         aspectRatio, zNear, zFar);
 
-    Vector3 cameraPosition = new Vector3(18.0, 18.0, 18.0);
-
-    Vector3 cameraFocusPosition = this._scene.first.getWorldCoordinates();
-
-    Vector3 upDirection = new Vector3(0.0, 1.0, 0.0);
-
-    Matrix4 v = makeViewMatrix(cameraPosition,
-        cameraFocusPosition,
-        upDirection);
-
-    Matrix4 mvp = m * v;
+    Matrix4 mvp = m * _getViewMatrix();
 
     this._lightDirection.normalize();
 
@@ -111,6 +144,17 @@ class WebGlApp {
     double angle = Math.PI / 10;
 
     switch (e.keyCode) {
+      case KeyCode.SPACE:
+        switch (_viewMode) {
+          case ViewMode.FIRST_PERSON:
+            _viewMode = ViewMode.THIRD_PERSON;
+            break;
+          case ViewMode.THIRD_PERSON:
+            _viewMode = ViewMode.FIRST_PERSON;
+            break;
+        }
+        break;
+
       case KeyCode.LEFT:
         player.goTo(player.x-1, player.y);
         break;
