@@ -1,7 +1,7 @@
 import 'package:vector_math/vector_math.dart';
 import "dart:typed_data";
 import "package:test/test.dart";
-import '../web/model.dart';
+import 'package:webgltest/model.dart';
 import 'dart:io';
 
 void main() {
