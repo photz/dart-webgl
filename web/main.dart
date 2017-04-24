@@ -34,7 +34,7 @@ class WebGlApp {
 
     this._gl = new DebugRenderingContext(this._canvas.getContext('webgl'));
 
-    this._gl.clearColor(0, 0, 0, 1);
+    this._gl.clearColor(0, 0, 0, 0);
 
     this._scene = new List();
 
