@@ -52,7 +52,7 @@ class Cube {
 
     Vector3 worldCoordinates = new Vector3(
         this._x * multiplier + 0.5,
-        0.5,
+        0.0,
         this._y * multiplier + 0.5);
 
     return worldCoordinates;
