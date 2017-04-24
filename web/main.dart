@@ -96,7 +96,17 @@ class WebGlApp {
         break;
         
       case ViewMode.THIRD_PERSON:
-        cameraPosition = new Vector3(18.0, 18.0, 18.0);
+        const double distance = 20.0;
+
+        Vector4 test = new Vector4(distance, 0.0, 0.0, 1.0);
+
+
+        Matrix4 mat = new Matrix4.rotationY(this._scene.first.angle);
+
+        test = mat * test;
+
+        cameraPosition = this._scene.first.getWorldCoordinates() - test.xyz + new Vector3(0.0, 18.0, 0.0);
+
         cameraFocusPosition = this._scene.first.getWorldCoordinates();
         break;
     }
