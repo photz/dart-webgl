@@ -28,8 +28,8 @@ class MySphere {
 
     if (_gl == null) {
       _gl = gl;
-      String vshader = myLoadShader('cube.vert');
-      String fshader = myLoadShader('cube.frag');
+      String vshader = myLoadShader('sphere.vert');
+      String fshader = myLoadShader('sphere.frag');
       _program = createProgram(_gl, vshader, fshader);
       _gl.useProgram(program);
       String modelData = myLoadModel('sphere.obj');
