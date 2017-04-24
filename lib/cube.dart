@@ -39,6 +39,9 @@ class Cube {
       this._setUpPointers();
     }
 
+    assert(_gl.isProgram(_program));
+    assert(_gl.isBuffer(_buffer));
+
     this._x = x;
     this._y = y;
   }
