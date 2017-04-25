@@ -56,4 +56,34 @@ main() {
     expect(heap.pop().weight, equals(3));
     expect(heap.pop().weight, equals(4));
   });
+
+  test("heap", () {
+    var heap = new Heap();
+
+    for (int i = 11; i < 100000; i += 2) {
+      heap.insert(i);
+    }
+
+    heap.insert(39);
+    heap.insert(3);
+    heap.insert(32);
+    heap.insert(230);
+    heap.insert(4);
+
+    for (int i = 10; i < 100000; i += 2) {
+      heap.insert(i);
+    }
+
+    for (int i = 0; i > -1000; i--) {
+      heap.insert(i);
+    }
+
+    expect(heap.pop(), equals(-999));
+
+    for (int i = -1000; i < 100000; i += 2) {
+      heap.insert(i);
+    }
+
+    expect(heap.pop(), equals(-1000));
+  });
 }
