@@ -7,6 +7,7 @@ import 'package:webgltest/cube.dart';
 import 'dart:math' as Math;
 import 'package:webgltest/grid.dart';
 import 'package:webgltest/sphere.dart';
+import 'package:webgltest/scene.dart' as scene;
 
 enum ViewMode {
   FIRST_PERSON,
@@ -16,13 +17,14 @@ enum ViewMode {
 class WebGlApp {
   CanvasElement _canvas;
   RenderingContext _gl;
-  List _scene;
   Vector3 _ambientLightColor;
   Vector3 _lightDirection;
   Vector3 _lightColor;
   Grid _grid;
   bool _running = false;
   ViewMode _viewMode = ViewMode.FIRST_PERSON;
+  scene.Scene _scene;
+  var _player;
 
   WebGlApp(int width, int height) {
 
@@ -34,35 +36,36 @@ class WebGlApp {
 
     this._gl = new DebugRenderingContext(this._canvas.getContext('webgl'));
 
-    this._gl.clearColor(0, 0, 0, 0);
+    final Vector4 skyBlue = new Vector4(197.0 / 255.0,
+        224.0 / 255.0, 220.0 / 255.0, 0.0);
 
-    this._scene = new List();
+    this._gl.clearColor(skyBlue.x, skyBlue.y, skyBlue.z, skyBlue.w);
+
+    this._scene = new scene.Scene();
 
     document.body.onKeyDown.listen(this._onKeyDown);
 
     this._grid = new Grid.create(this._gl);
 
-    this.addObjectToScene(new MySphere.create(this._gl, 5, 5,
-            new Vector3(1.0, 1.0, 0.0)));
-    this.addObjectToScene(new Cube.create(this._gl, 1, 4,
+    _player = new MySphere.create(this._gl, 5, 5,
+        new Vector3(1.0, 1.0, 0.0));
+
+    _scene.addToScene(_player);
+    _scene.addToScene(new Cube.create(this._gl, 1, 4,
             new Vector3(1.0, 0.0, 0.0)));
-    this.addObjectToScene(new Cube.create(this._gl, 1, 3,
+    _scene.addToScene(new Cube.create(this._gl, 1, 3,
             new Vector3(0.0, 1.0, 0.0)));
-    this.addObjectToScene(new Cube.create(this._gl, 2, 3,
+    _scene.addToScene(new Cube.create(this._gl, 2, 3,
             new Vector3(0.0, 0.0, 1.0)));
-    this.addObjectToScene(new Cube.create(this._gl, 4, 1,
+    _scene.addToScene(new Cube.create(this._gl, 4, 1,
             new Vector3(1.0, 0.0, 1.0)));
-    //this.addObjectToScene(new Pyramid(this._gl));
+
 
     this._gl.enable(DEPTH_TEST);
 
     this._ambientLightColor = new Vector3(0.05, 0.05, 0.05);
     this._lightDirection = new Vector3(0.5, 3.0, 4.0);
     this._lightColor = new Vector3(1.0, 1.0, 1.0);
-  }
-
-  void addObjectToScene(obj) {
-    this._scene.add(obj);
   }
 
   startLoop() async {
@@ -81,12 +84,12 @@ class WebGlApp {
 
       case ViewMode.FIRST_PERSON:
 
-        Vector3 playerCoords = this._scene.first.getWorldCoordinates();
+        Vector3 playerCoords = _player.getWorldCoordinates();
 
         cameraPosition = playerCoords;
 
         Matrix4 mat = new Matrix4
-          .rotationY(this._scene.first.angle);
+          .rotationY(_player.angle);
 
         Vector4 testVec = new Vector4(1.0, 0.0, 0.0, 0.0);
 
@@ -100,14 +103,13 @@ class WebGlApp {
 
         Vector4 test = new Vector4(distance, 0.0, 0.0, 1.0);
 
-
-        Matrix4 mat = new Matrix4.rotationY(this._scene.first.angle);
+        Matrix4 mat = new Matrix4.rotationY(_player.angle);
 
         test = mat * test;
 
-        cameraPosition = this._scene.first.getWorldCoordinates() - test.xyz + new Vector3(0.0, 18.0, 0.0);
+        cameraPosition = _player.getWorldCoordinates() - test.xyz + new Vector3(0.0, 18.0, 0.0);
 
-        cameraFocusPosition = this._scene.first.getWorldCoordinates();
+        cameraFocusPosition = _player.getWorldCoordinates();
         break;
     }
 
@@ -137,24 +139,36 @@ class WebGlApp {
 
     this._grid.draw(mvp, time);
 
-    for (var obj in this._scene) {
+    _scene.forEachObject((obj) {
       obj.draw(mvp, time,
           this._lightColor, this._lightDirection,
           this._ambientLightColor, lightPosition);
-    }
+    });
   }
 
   Element getElement() {
     return this._canvas;
   }
 
-  void _onKeyDown(KeyboardEvent e) {
-    var player = this._scene.first;
+  void _createBlock() {
 
-    double angle = Math.PI / 10;
+    var test = new Vector4(1.0, 0.0, 0.0, 1.0);
+
+    var m = new Matrix4.rotationY(_player.angle);
+
+    test = m * test;
+
+    var pos = _player.getWorldCoordinates() + test.xyz;
+
+    _scene.addToScene(new Cube.create(this._gl, pos.x.round(), pos.z.round(),
+            new Vector3(1.0, 0.0, 1.0)));
+  }
+
+  void _onKeyDown(KeyboardEvent e) {
+    double angle = Math.PI / 2;
 
     switch (e.keyCode) {
-      case KeyCode.SPACE:
+      case KeyCode.V:
         switch (_viewMode) {
           case ViewMode.FIRST_PERSON:
             _viewMode = ViewMode.THIRD_PERSON;
@@ -165,41 +179,47 @@ class WebGlApp {
         }
         break;
 
+      case KeyCode.SPACE:
+        _createBlock();
+        break;
+
       case KeyCode.LEFT:
-        player.goTo(player.x-1, player.y);
+        _player.goTo(_player.x-1, _player.y);
         break;
 
       case KeyCode.RIGHT:
-        player.goTo(player.x+1, player.y);
+        _player.goTo(_player.x+1, _player.y);
         break;
 
       case KeyCode.UP:
-        player.goTo(player.x, player.y-1);
+        _player.goTo(_player.x, _player.y-1);
         break;
 
       case KeyCode.DOWN:
-        player.goTo(player.x, player.y+1);
+        _player.goTo(_player.x, _player.y+1);
         break;
 
       case KeyCode.Q:
-        player.setAngle(player.angle + angle);
+        _player.setAngle(_player.angle + angle);
         break;
       case KeyCode.E:
-        player.setAngle(player.angle - angle);
+        _player.setAngle(_player.angle - angle);
         break;
 
       case KeyCode.P:
         this._running = !this._running;
         if (this._running) {
-          this.startLoop();
+          //this.startLoop();
         }
         break;
     }
+
+    this._redraw(0.1);
   }
 }
 
 void main() {
   WebGlApp a = new WebGlApp(window.innerWidth, window.innerHeight);
   document.body.children.add(a.getElement());
-  a.startLoop();
+  //a.startLoop();
 }

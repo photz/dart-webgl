@@ -125,3 +125,22 @@ List<Point> findPath(Point origin, Point dest) {
     nextUp.explored = true;
   }
 }
+
+class Scene {
+  final List _objects;
+
+  
+
+  Scene()
+    : _objects = new List() {
+    
+  }
+
+  void addToScene(obj) {
+    _objects.add(obj);
+  }
+
+  void forEachObject(f) {
+    _objects.forEach(f);
+  }
+}
