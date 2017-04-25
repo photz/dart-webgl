@@ -11,8 +11,8 @@ main() {
   });
 
   test("finding another path", () {
-    List<Point> path = findPath(new Point(0, 0), new Point(-200, -200));
-    expect(path.length, equals(400));
+    List<Point> path = findPath(new Point(0, 0), new Point(-400, -400));
+    expect(path.length, equals(800));
   });
 
 }
