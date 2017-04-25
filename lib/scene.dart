@@ -1,3 +1,4 @@
+import 'package:webgltest/heap.dart';
 
 class Point {
   int x;
@@ -76,23 +77,19 @@ List<Point> getNeighbors(Point p) {
 }
 
 List<Point> findPath(Point origin, Point dest) {
-  List<Record> open = [];
+  Heap open = new Heap((record) => record.distance);
 
   Grid grid = new Grid();
 
   Record originRec = new Record(origin, null, 0, false);
 
-  open.add(originRec);
+  open.insert(originRec);
   grid.set(0, 0, originRec);
 
-  grid.set(0, 1, new Record(new Point(0, 5), null, 1000000, true));
-  grid.set(1, 1, new Record(new Point(0, 5), null, 1000000, true));
-  grid.set(-1, 0, new Record(new Point(0, 5), null, 1000000, true));
-
   while (!open.isEmpty) {
-    open.sort((a, b) => a.distance.compareTo(b.distance));
+    //open.sort((a, b) => a.distance.compareTo(b.distance));
 
-    Record nextUp = open.removeAt(0);
+    Record nextUp = open.pop();
 
     //print('now looking at ${nextUp.location.x}|${nextUp.location.y}');
 
@@ -104,7 +101,7 @@ List<Point> findPath(Point origin, Point dest) {
         
       if (r == null) {
         r = new Record(neighbor, nextUp.location, nextUp.distance + 1, false);
-        open.add(r);
+        open.insert(r);
         grid.set(neighbor.x, neighbor.y, r);
       }
       else if (nextUp.distance + 1 < r.distance) {
