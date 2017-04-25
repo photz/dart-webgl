@@ -16,7 +16,9 @@ class Record {
   Point cameFrom;
   int distance;
   bool explored;
-  Record(this.location, this.cameFrom, this.distance, this.explored);
+  int fscore;
+  Record(this.location,
+      this.cameFrom, this.distance, this.explored, this.fscore);
 }
 
 class Grid {
@@ -76,12 +78,17 @@ List<Point> getNeighbors(Point p) {
   return ps;
 }
 
+int getFscore(Point a, Point b) {
+  return ((a.x - a.y) + (b.x - b.y)).abs();
+}
+
 List<Point> findPath(Point origin, Point dest) {
-  Heap open = new Heap((record) => record.distance);
+  Heap open = new Heap((record) => record.fscore);
 
   Grid grid = new Grid();
 
-  Record originRec = new Record(origin, null, 0, false);
+  Record originRec = new Record(origin, null, 0, false,
+      getFscore(origin, dest));
 
   open.insert(originRec);
   grid.set(0, 0, originRec);
@@ -100,7 +107,7 @@ List<Point> findPath(Point origin, Point dest) {
       Record r = grid.get(neighbor.x, neighbor.y);
         
       if (r == null) {
-        r = new Record(neighbor, nextUp.location, nextUp.distance + 1, false);
+        r = new Record(neighbor, nextUp.location, nextUp.distance + 1, false, nextUp.distance + 1 + getFscore(neighbor, dest));
         open.insert(r);
         grid.set(neighbor.x, neighbor.y, r);
       }
