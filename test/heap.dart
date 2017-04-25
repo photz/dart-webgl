@@ -1,6 +1,11 @@
 import 'package:test/test.dart';
 import 'package:webgltest/heap.dart';
 
+class Bag {
+  int weight;
+  Bag(this.weight);
+}
+
 main() {
   test("using the heap", () {
 
@@ -31,5 +36,24 @@ main() {
     expect(heap.pop(), equals(2));
     expect(heap.pop(), equals(3));
     expect(heap.pop(), equals(4));
+  });
+
+  test("providing a score function", () {
+
+    var score = (bag) => bag.weight;
+
+    var heap = new Heap.fromList([
+      new Bag(2),
+      new Bag(3),
+      new Bag(5),
+      new Bag(4),
+      new Bag(8),
+      new Bag(7),
+      new Bag(6)
+    ], score);
+
+    expect(heap.pop().weight, equals(2));
+    expect(heap.pop().weight, equals(3));
+    expect(heap.pop().weight, equals(4));
   });
 }

@@ -1,19 +1,26 @@
 class Heap {
   final List _elements;
-
-  var _compare;
+  var _score = (x) => x;
   
-  Heap()
-    : _elements = new List();
+  Heap([int score(x)])
+    : _elements = new List() {
+    if (score != null) {
+      _score = score;
+    }
+  }
 
-  Heap.fromList(this._elements, );
+  Heap.fromList(this._elements, [int score(x)]) {
+    if (score != null) {
+      _score = score;
+    }
+  }
 
   void insert(x) {
     _elements.add(x);
     int indexNewEl = _elements.length - 1;
     while (0 < indexNewEl) {
       int parentIndex = _parent(indexNewEl);
-      if (_elements[indexNewEl] < _elements[parentIndex]) {
+      if (_score(_elements[indexNewEl]) < _score(_elements[parentIndex])) {
         var newEl = _elements[indexNewEl];
         _elements[indexNewEl] = _elements[parentIndex];
         _elements[parentIndex] = newEl;
@@ -41,7 +48,7 @@ class Heap {
 
       var leftChild = _elements[leftChildIndex];
 
-      if (leftChild < lastEl) {
+      if (_score(leftChild) < _score(lastEl)) {
         _elements[leftChildIndex] = lastEl;
         _elements[currentIndex] = leftChild;
         currentIndex = leftChildIndex;
