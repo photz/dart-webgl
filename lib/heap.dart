@@ -25,6 +25,10 @@ class Heap {
   }
 
   pop() {
+    if (_elements.length == 1) {
+      return _elements.removeAt(0);
+    }
+    
     var returnEl = _elements.first;
 
     var lastEl = _elements.removeAt(_elements.length - 1);
