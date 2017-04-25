@@ -3,6 +3,8 @@ class Heap {
 
   var _score = (x) => x;
   
+  bool get isEmpty => _elements.isEmpty;
+
   Heap([int score(x)])
     : _elements = new List() {
     if (score != null) {
