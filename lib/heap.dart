@@ -18,18 +18,7 @@ class Heap {
   void insert(x) {
     _elements.add(x);
     int indexNewEl = _elements.length - 1;
-    while (0 < indexNewEl) {
-      int parentIndex = _parent(indexNewEl);
-      if (_score(_elements[indexNewEl]) < _score(_elements[parentIndex])) {
-        var newEl = _elements[indexNewEl];
-        _elements[indexNewEl] = _elements[parentIndex];
-        _elements[parentIndex] = newEl;
-        indexNewEl = parentIndex;
-      }
-      else {
-        break;
-      }
-    }
+    _bubbleUp(indexNewEl);
   }
 
   pop() {
@@ -39,7 +28,15 @@ class Heap {
 
     _elements[0] = lastEl;
 
-    int currentIndex = 0;
+    _sinkDown(0);
+
+    return returnEl;
+  }
+
+  _sinkDown(int index) {
+    var lastEl = _elements[index];
+
+    int currentIndex = index;
 
     while (_hasLeftChild(currentIndex)) {
 
@@ -49,16 +46,33 @@ class Heap {
       var leftChild = _elements[leftChildIndex];
 
       if (_score(leftChild) < _score(lastEl)) {
-        _elements[leftChildIndex] = lastEl;
-        _elements[currentIndex] = leftChild;
+        _swap(leftChildIndex, currentIndex);
         currentIndex = leftChildIndex;
       }
       else {
         break;
       }
     }    
+  }
 
-    return returnEl;
+  _bubbleUp(int index) {
+    while (0 < index) {
+      int parentIndex = _parent(index);
+      if (_score(_elements[index]) < _score(_elements[parentIndex])) {
+        var newEl = _elements[index];
+        _swap(index, parentIndex);
+        index = parentIndex;
+      }
+      else {
+        break;
+      }
+    }
+  }
+
+  _swap(int aIndex, int bIndex) {
+    var a = _elements[aIndex];
+    _elements[aIndex] = _elements[bIndex];
+    _elements[bIndex] = a;
   }
 
   bool _hasLeftChild(int parentIndex) {
