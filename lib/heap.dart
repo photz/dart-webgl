@@ -1,5 +1,6 @@
 class Heap {
   final List _elements;
+
   var _score = (x) => x;
   
   Heap([int score(x)])
@@ -33,7 +34,7 @@ class Heap {
     return returnEl;
   }
 
-  _sinkDown(int index) {
+  void _sinkDown(int index) {
     var lastEl = _elements[index];
 
     int currentIndex = index;
@@ -41,13 +42,27 @@ class Heap {
     while (_hasLeftChild(currentIndex)) {
 
       int leftChildIndex = _leftChild(currentIndex);
-      //int rightChildIndex = _rightChild(currentIndex);
+      int rightChildIndex = _rightChild(currentIndex);
 
       var leftChild = _elements[leftChildIndex];
 
-      if (_score(leftChild) < _score(lastEl)) {
-        _swap(leftChildIndex, currentIndex);
-        currentIndex = leftChildIndex;
+      bool swappingRequired = _score(leftChild) < _score(lastEl) ||
+        (_hasRightChild(currentIndex) &&
+            _score(_elements[rightChildIndex]) < _score(lastEl));
+
+      bool swapWithLeftChild = !_hasRightChild(currentIndex) ||
+        _score(leftChild) < _score(_elements[rightChildIndex]);
+
+      if (swappingRequired) {
+
+        if (swapWithLeftChild) {
+          _swap(leftChildIndex, currentIndex);
+          currentIndex = leftChildIndex;
+        }
+        else {
+          _swap(rightChildIndex, currentIndex);
+          currentIndex = rightChildIndex;
+        }
       }
       else {
         break;
@@ -55,7 +70,7 @@ class Heap {
     }    
   }
 
-  _bubbleUp(int index) {
+  void _bubbleUp(int index) {
     while (0 < index) {
       int parentIndex = _parent(index);
       if (_score(_elements[index]) < _score(_elements[parentIndex])) {
@@ -69,7 +84,7 @@ class Heap {
     }
   }
 
-  _swap(int aIndex, int bIndex) {
+  void _swap(int aIndex, int bIndex) {
     var a = _elements[aIndex];
     _elements[aIndex] = _elements[bIndex];
     _elements[bIndex] = a;
@@ -91,13 +106,10 @@ class Heap {
   }
 
   int _rightChild(int parentIndex) {
-    assert(0 =< parentIndex);
+    assert(0 <= parentIndex);
     assert(parentIndex < _elements.length);
 
-    int parentPos = parentIndex + 1;
-    int rightChildPos = 2 * parentPos + 1;
-    int rightChildIndex = rightChildPos - 1;
-    return rightChildIndex;
+    return _leftChild(parentIndex) + 1;
   }
 
   int _parent(int childIndex) {
