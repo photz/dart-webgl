@@ -22,7 +22,7 @@ class WebGlApp {
   Vector3 _lightColor;
   Grid _grid;
   bool _running = false;
-  ViewMode _viewMode = ViewMode.FIRST_PERSON;
+  ViewMode _viewMode = ViewMode.THIRD_PERSON;
   scene.Scene _scene;
   var _player;
 
