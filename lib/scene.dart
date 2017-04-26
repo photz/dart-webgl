@@ -129,7 +129,10 @@ List<Point> findPath(Point origin, Point dest) {
 class Scene {
   final List _objects;
 
-  
+  /// Indicates if the field with the given coordinate is free.
+  bool isFree(int x, int y) {
+    return !_objects.any((o) => o.x == x && o.y == y);
+  }
 
   Scene()
     : _objects = new List() {
