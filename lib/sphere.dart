@@ -1,32 +1,56 @@
-import 'package:vector_math/vector_math.dart';
+import 'dart:math' as Math;
 import 'dart:typed_data';
 import 'dart:web_gl';
-import 'dart:math' as Math;
-import 'model.dart';
+
+import 'package:vector_math/vector_math.dart';
+
+import 'package:webgltest/utils.dart';
+import 'package:webgltest/model.dart';
 import 'package:webgltest/load_shader.dart';
-import 'utils.dart';
+import 'package:webgltest/scene.dart' as scene;
+
+
 
 class MySphere {
 
   static RenderingContext _gl;
   static Program _program;
   static Buffer _buffer;
+  static scene.Scene _scene;
 
   RenderingContext get gl => _gl;
   Program get program => _program;
+
+  /// The current position of the object in the world
   int _x;
+
+  /// The current position of the object in the world
   int _y;
+
+  /// The orientation of the object in radians
   double _angle = 0.0;
+
+  /// The color of the object
   Vector3 _color;
+
+  /// The current goal or destination the object is trying to get to
+  scene.Point _goal;
+
+  /// Timestamp of the last update in microseconds
+  int _lastNavUpdate = 0;
+
+  /// The route the object is currently following
+  List<scene.Point> _path = [];
   
   int get x => _x;
   int get y => _y;
   double get angle => _angle;
 
-  MySphere.create(RenderingContext gl, int x, int y, Vector3 color)
+  MySphere.create(scene.Scene scene, RenderingContext gl, int x, int y, Vector3 color)
     : _color = color {
 
     if (_gl == null) {
+      _scene = scene;
       _gl = gl;
       String vshader = myLoadShader('sphere.vert');
       String fshader = myLoadShader('sphere.frag');
@@ -90,6 +114,8 @@ class MySphere {
 
     _setUpPointers();
 
+    _updateNav();
+
     gl.uniform3fv(this._u('u_Color'), this._color.storage);
     gl.uniform3fv(this._u('u_LightColor'), lightColor.storage);
     gl.uniform3fv(this._u('u_LightPosition'), lightPosition.storage);
@@ -98,6 +124,40 @@ class MySphere {
     this._drawMySphere(mvp);
   }
 
+  void _updateNav() {
+    if (null == _goal || _path.isEmpty) return;
+
+    int now = (new DateTime.now()).microsecondsSinceEpoch;
+
+    // 1 second
+    int min = 1000 * 1000;
+
+    if (min < now - _lastNavUpdate) {
+      var next = _path.removeAt(0);
+      _x = next.x;
+      _y = next.y;
+      _lastNavUpdate = now;
+    }
+  }
+
+  void updateAi() {
+    if (_goal != null) {
+
+      scene.Point currentPos = new scene.Point(x, y);
+
+      var path = _scene.findPath(currentPos, _goal);
+
+      if (path == false) {
+        _path = [];
+        print('currently unable to go there');
+      }
+      else {
+        _path = path;
+      }
+
+      //_lastNavUpdate = (new DateTime.now()).microsecondsSinceEpoch;
+    }
+  }
 
   void _drawMySphere(Matrix4 viewMatrix) {
     this.gl.uniformMatrix4fv(this._u('u_ViewMatrix'),
@@ -168,4 +228,9 @@ class MySphere {
         3 * Float32List.BYTES_PER_ELEMENT);
     gl.enableVertexAttribArray(this._a('a_Normal'));
   }
+
+  void navigate(int x, int y) {
+    _goal = new scene.Point(x, y);
+  }
 }
+
