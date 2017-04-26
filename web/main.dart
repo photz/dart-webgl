@@ -25,6 +25,7 @@ class WebGlApp {
   ViewMode _viewMode = ViewMode.THIRD_PERSON;
   scene.Scene _scene;
   var _player;
+  int _lastAiUpdate = 0;
 
   WebGlApp(int width, int height) {
 
@@ -47,12 +48,15 @@ class WebGlApp {
 
     this._grid = new Grid.create(this._gl);
 
-    _player = new MySphere.create(this._gl, 5, 5,
-        new Vector3(1.0, 1.0, 0.0));
+    _player = new Cube.create(this._gl, 1, 4,
+        new Vector3(1.0, 0.0, 0.0));
+
 
     _scene.addToScene(_player);
-    _scene.addToScene(new Cube.create(this._gl, 1, 4,
-            new Vector3(1.0, 0.0, 0.0)));
+
+    var sphere = new MySphere.create(_scene, _gl, 5, 5,
+        new Vector3(1.0, 1.0, 0.0));
+    _scene.addToScene(sphere);
     _scene.addToScene(new Cube.create(this._gl, 1, 3,
             new Vector3(0.0, 1.0, 0.0)));
     _scene.addToScene(new Cube.create(this._gl, 2, 3,
@@ -60,6 +64,8 @@ class WebGlApp {
     _scene.addToScene(new Cube.create(this._gl, 4, 1,
             new Vector3(1.0, 0.0, 1.0)));
 
+
+    sphere.navigate(50, 5);
 
     this._gl.enable(DEPTH_TEST);
 
@@ -122,7 +128,20 @@ class WebGlApp {
     return v;
   }
 
+  void _updateAis() {
+    int now = (new DateTime.now()).microsecondsSinceEpoch;
+
+    int min = 500 * 1000;
+
+    if (min < now - _lastAiUpdate) {
+      _scene.forEachObject((o) => o.updateAi());
+      _lastAiUpdate = now;
+    }
+  }
+
   void _redraw(time) {
+    _updateAis();
+
     this._gl.clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
     double fovYRadians = 30.0 * degrees2Radians;
     double aspectRatio = this._canvas.width / this._canvas.height;
@@ -209,17 +228,17 @@ class WebGlApp {
       case KeyCode.P:
         this._running = !this._running;
         if (this._running) {
-          //this.startLoop();
+          this.startLoop();
         }
         break;
     }
 
-    this._redraw(0.1);
+    //this._redraw(0.1);
   }
 }
 
 void main() {
   WebGlApp a = new WebGlApp(window.innerWidth, window.innerHeight);
   document.body.children.add(a.getElement());
-  //a.startLoop();
+  a.startLoop();
 }
