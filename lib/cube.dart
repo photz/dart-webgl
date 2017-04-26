@@ -152,6 +152,10 @@ class Cube {
     return buffer;
   }
 
+  void updateAi() {
+
+  }
+
   void _setUpPointers() {
     gl.bindBuffer(ARRAY_BUFFER, _buffer);
     gl.vertexAttribPointer(this._a('a_Position'),
