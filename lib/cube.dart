@@ -22,6 +22,7 @@ class Cube {
   int get x => _x;
   int get y => _y;
   double get angle => _angle;
+  Vector3 get color => _color;
 
   Cube.create(RenderingContext gl, int x, int y, Vector3 color)
     : _color = color {
