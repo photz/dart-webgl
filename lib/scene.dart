@@ -51,80 +51,7 @@ class Grid {
   }
 }
 
-List<Point> getPath(Grid grid, Point origin, Point dest) {
-  List<Point> path = [];
 
-  Point current = dest;
-
-  while (current.x != origin.x || current.y != origin.y) {
-    Record r = grid.get(current.x, current.y);
-
-    path.add(current);
-
-    current = r.cameFrom;
-  }
-
-  return new List.from(path.reversed);
-}
-
-List<Point> getNeighbors(Point p) {
-  List<Point> ps = [];
-
-  ps.add(new Point(p.x, p.y + 1));
-  ps.add(new Point(p.x, p.y - 1));
-  ps.add(new Point(p.x + 1, p.y));
-  ps.add(new Point(p.x - 1, p.y));
-
-  return ps;
-}
-
-int getFscore(Point a, Point b) {
-  return ((a.x - a.y) + (b.x - b.y)).abs();
-}
-
-List<Point> findPath(Point origin, Point dest) {
-  Heap open = new Heap((record) => record.fscore);
-
-  Grid grid = new Grid();
-
-  Record originRec = new Record(origin, null, 0, false,
-      getFscore(origin, dest));
-
-  open.insert(originRec);
-  grid.set(0, 0, originRec);
-
-  while (!open.isEmpty) {
-    //open.sort((a, b) => a.distance.compareTo(b.distance));
-
-    Record nextUp = open.pop();
-
-    //print('now looking at ${nextUp.location.x}|${nextUp.location.y}');
-
-    List<Point> neighbors = getNeighbors(nextUp.location);
-
-    for (Point neighbor in neighbors) {
-
-      Record r = grid.get(neighbor.x, neighbor.y);
-        
-      if (r == null) {
-        r = new Record(neighbor, nextUp.location, nextUp.distance + 1, false, nextUp.distance + 1 + getFscore(neighbor, dest));
-        open.insert(r);
-        grid.set(neighbor.x, neighbor.y, r);
-      }
-      else if (nextUp.distance + 1 < r.distance) {
-        r.distance = nextUp.distance + 1;
-        r.cameFrom = nextUp.location;
-      }
-
-      if (neighbor.x == dest.x && neighbor.y == dest.y) {
-        return getPath(grid, origin, dest);
-        return;
-      }
-    }
-
-    nextUp.explored = true;
-  }
-}
 
 class Scene {
   final List _objects;
@@ -146,4 +73,83 @@ class Scene {
   void forEachObject(f) {
     _objects.forEach(f);
   }
+
+  List<Point> findPath(Point origin, Point dest) {
+    Heap open = new Heap((record) => record.fscore);
+
+    Grid grid = new Grid();
+
+    Record originRec = new Record(origin, null, 0, false,
+        _getFscore(origin, dest));
+
+    open.insert(originRec);
+    grid.set(0, 0, originRec);
+
+    while (!open.isEmpty) {
+      //open.sort((a, b) => a.distance.compareTo(b.distance));
+
+      Record nextUp = open.pop();
+
+      //print('now looking at ${nextUp.location.x}|${nextUp.location.y}');
+
+      List<Point> neighbors = _getNeighbors(nextUp.location);
+
+      for (Point neighbor in neighbors) {
+
+        if (!isFree(neighbor.x, neighbor.y)) continue;
+
+        Record r = grid.get(neighbor.x, neighbor.y);
+        
+        if (r == null) {
+          r = new Record(neighbor, nextUp.location, nextUp.distance + 1, false, nextUp.distance + 1 + _getFscore(neighbor, dest));
+          open.insert(r);
+          grid.set(neighbor.x, neighbor.y, r);
+        }
+        else if (nextUp.distance + 1 < r.distance) {
+          r.distance = nextUp.distance + 1;
+          r.cameFrom = nextUp.location;
+        }
+
+        if (neighbor.x == dest.x && neighbor.y == dest.y) {
+          return _getPath(grid, origin, dest);
+        }
+      }
+
+      nextUp.explored = true;
+    }
+
+    return false;
+  }
+
+  List<Point> _getPath(Grid grid, Point origin, Point dest) {
+    List<Point> path = [];
+
+    Point current = dest;
+
+    while (current.x != origin.x || current.y != origin.y) {
+      Record r = grid.get(current.x, current.y);
+
+      path.add(current);
+
+      current = r.cameFrom;
+    }
+
+    return new List.from(path.reversed);
+  }
+
+  List<Point> _getNeighbors(Point p) {
+    List<Point> ps = [];
+
+    ps.add(new Point(p.x, p.y + 1));
+    ps.add(new Point(p.x, p.y - 1));
+    ps.add(new Point(p.x + 1, p.y));
+    ps.add(new Point(p.x - 1, p.y));
+
+    return ps;
+  }
+
+  int _getFscore(Point a, Point b) {
+    return ((a.x - a.y) + (b.x - b.y)).abs();
+  }
+
 }
