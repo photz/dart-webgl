@@ -47,7 +47,6 @@ class Cube {
     this._y = y;
   }
 
-
   Vector3 getWorldCoordinates() {
     double multiplier = 1.0;
 
@@ -63,22 +62,6 @@ class Cube {
     this._angle = newAngle;
   }
 
-
-  void _setAmbientLightColor(Vector3 ambientLightColor) {
-    gl.uniform3fv(this._u('u_AmbientLight'),
-        ambientLightColor.storage);
-  }
-
-  UniformLocation _u(String uniformName) {
-    UniformLocation u = gl.getUniformLocation(program,
-        uniformName);
-
-    if (u == null) {
-      throw new Exception("no such uniform: " + uniformName);
-    }
-
-    return u;
-  }
 
   void goTo(int x, int y) {
     this._x = x;
@@ -101,6 +84,25 @@ class Cube {
     this._drawCube(mvp);
   }
 
+  void updateAi() {
+
+  }
+
+  void _setAmbientLightColor(Vector3 ambientLightColor) {
+    gl.uniform3fv(this._u('u_AmbientLight'),
+        ambientLightColor.storage);
+  }
+
+  UniformLocation _u(String uniformName) {
+    UniformLocation u = gl.getUniformLocation(program,
+        uniformName);
+
+    if (u == null) {
+      throw new Exception("no such uniform: " + uniformName);
+    }
+
+    return u;
+  }
 
   void _drawCube(Matrix4 viewMatrix) {
     this.gl.uniformMatrix4fv(this._u('u_ViewMatrix'),
@@ -141,6 +143,7 @@ class Cube {
     return attribLocation;
   }
 
+
   Buffer _fillBufferWithModelData(Model model) {
     Float32List positionsNormals = model.positionsAndNormalsToArr();
 
@@ -152,9 +155,6 @@ class Cube {
     return buffer;
   }
 
-  void updateAi() {
-
-  }
 
   void _setUpPointers() {
     gl.bindBuffer(ARRAY_BUFFER, _buffer);
