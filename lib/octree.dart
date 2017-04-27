@@ -16,7 +16,7 @@ class NoMatchingSubtreeError extends StateError {
 }
 
 class Octree {
-  static const int _maxObjectsPerLeaf = 16000000000000;
+  static const int _maxObjectsPerLeaf = 16;
   final Map<OctreePos, Octree> _children;
   final Aabb3 _box;
   final Octree _parent;
