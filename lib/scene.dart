@@ -1,5 +1,6 @@
 import 'package:webgltest/heap.dart';
 
+
 class Point {
   int x;
   int y;
@@ -56,24 +57,23 @@ class Grid {
 class Scene {
   final List _objects;
 
+  /// Creates a new scene with nothing in it.
+  Scene() : _objects = new List();
+
+  /// Adds the given object to the scene.
+  void addToScene(obj) =>_objects.add(obj);
+
+
+  /// Applies the given function to each object in the scene.
+  void forEachObject(f) => _objects.forEach(f);
+
+  
   /// Indicates if the field with the given coordinate is free.
   bool isFree(int x, int y) {
     return !_objects.any((o) => o.x == x && o.y == y);
   }
 
-  Scene()
-    : _objects = new List() {
-    
-  }
-
-  void addToScene(obj) {
-    _objects.add(obj);
-  }
-
-  void forEachObject(f) {
-    _objects.forEach(f);
-  }
-
+  /// Finds a path from the given origin to destination.
   List<Point> findPath(Point origin, Point dest) {
     Heap open = new Heap((record) => record.fscore);
 
@@ -148,8 +148,5 @@ class Scene {
     return ps;
   }
 
-  int _getFscore(Point a, Point b) {
-    return ((a.x - a.y) + (b.x - b.y)).abs();
-  }
-
+  int _getFscore(Point a, Point b) => ((a.x - a.y) + (b.x - b.y)).abs();
 }
