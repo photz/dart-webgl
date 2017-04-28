@@ -45,6 +45,7 @@ class MySphere {
   int get x => _x;
   int get y => _y;
   double get angle => _angle;
+  bool _goalChanged = false;
 
   MySphere.create(scene.Scene scene, RenderingContext gl, int x, int y, Vector3 color)
     : _color = color {
@@ -143,17 +144,23 @@ class MySphere {
   void updateAi() {
     if (_goal != null) {
 
-      scene.Point currentPos = new scene.Point(x, y);
+      if (_goalChanged || !_isPathFree(_path)) {
+        scene.Point currentPos = new scene.Point(x, y);
 
-      var path = _scene.findPath(currentPos, _goal);
+        var path = _scene.findPath(currentPos, _goal);
 
-      if (path == false) {
-        _path = [];
-        print('currently unable to go there');
+        if (path == false) {
+          _path = [];
+          print('currently unable to go there');
+        }
+        else {
+          _path = path;
+        }
+
+        _goalChanged = false;
       }
-      else {
-        _path = path;
-      }
+
+
 
       //_lastNavUpdate = (new DateTime.now()).microsecondsSinceEpoch;
     }
@@ -231,6 +238,10 @@ class MySphere {
 
   void navigate(int x, int y) {
     _goal = new scene.Point(x, y);
+    _goalChanged = true;
   }
+
+  bool _isPathFree(List<scene.Point> path) =>
+      path.every((p) => _scene.isFree(p.x, p.y));
 }
 
