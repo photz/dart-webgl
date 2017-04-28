@@ -126,16 +126,77 @@ class Octree {
     }
   }
 
-  OctreePos _getPosFor(thingy) {
-    assert(OctreePos.values != null);
-    for (OctreePos pos in OctreePos.values) {
-      Aabb3 subtreeBox = _getBoundingBoxForSubtree(pos);
-      assert(thingy.box != null);
-      if (subtreeBox.containsAabb3(thingy.box)) {
-        return pos;
-      }
+  bool _onLhsOfCenter(thingy) {
+    if (_box.center.x < thingy.box.min.x) {
+      return true;
+    }
+    else if (thingy.box.max.x < _box.center.x) {
+      return false;
+    }
+    else {
+      throw new NoMatchingSubtreeError('');      
+    }
+  }
+
+  bool _aboveCenter(thingy) {
+    if (_box.center.y < thingy.box.min.y) {
+      return true;
+    }
+    else if (thingy.box.max.y < _box.center.y) {
+      return false;
+    }
+    else {
+      throw new NoMatchingSubtreeError('');
+    }
+  }
+
+  bool _inFrontOfCenter(thingy) {
+    if (_box.center.z < thingy.box.min.z) {
+      return true;
+    }
+    else if (thingy.box.max.z < _box.center.z) {
+      return false;
     }
     throw new NoMatchingSubtreeError('');
+  }
+
+  OctreePos _getPosFor(thingy) {
+    if (_aboveCenter(thingy)) {
+      if (_inFrontOfCenter(thingy)) {
+        if (_onLhsOfCenter(thingy)) {
+          return OctreePos.upperFrontLeft;
+        }
+        else {
+          return OctreePos.upperFrontRight;
+        }
+      }
+      else {
+        if (_onLhsOfCenter(thingy)) {
+          return OctreePos.upperBackLeft;
+        }
+        else {
+          return OctreePos.upperBackRight;
+        }        
+      }
+    }
+    else {
+      if (_inFrontOfCenter(thingy)) {
+        if (_onLhsOfCenter(thingy)) {
+          return OctreePos.lowerFrontLeft;
+        }
+        else {
+          return OctreePos.lowerFrontRight;
+        }
+      }
+      else {
+        if (_onLhsOfCenter(thingy)) {
+          return OctreePos.lowerBackLeft;
+        }
+        else {
+          return OctreePos.lowerBackRight;
+        }        
+      }
+    }
   }
 
   void _insertIntoSubtree(OctreePos pos, thingy) {
