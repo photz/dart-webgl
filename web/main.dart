@@ -135,7 +135,7 @@ class WebGlApp {
   void _updateAis() {
     int now = (new DateTime.now()).microsecondsSinceEpoch;
 
-    int min = 500 * 1000;
+    int min = 1000 * 1000;
 
     if (min < now - _lastAiUpdate) {
       _scene.forEachObject((o) => o.updateAi());
