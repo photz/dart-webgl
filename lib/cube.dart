@@ -1,10 +1,12 @@
-import 'package:vector_math/vector_math.dart';
 import 'dart:typed_data';
 import 'dart:web_gl';
 import 'dart:math' as Math;
-import 'model.dart';
+
+import 'package:vector_math/vector_math.dart';
+
 import 'package:webgltest/load_shader.dart';
-import 'utils.dart';
+import 'package:webgltest/model.dart';
+import 'package:webgltest/utils.dart';
 
 class Cube {
 
