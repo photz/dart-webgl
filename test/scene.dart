@@ -6,12 +6,14 @@ import 'dart:developer' as developer;
 main() {
 
   test("finding a path", () {
-    List<Point> path = findPath(new Point(0, 0), new Point(2, 1));
+    Scene scene = new Scene();
+    List<Point> path = scene.findPath(new Point(0, 0), new Point(2, 1));
     expect(path.length, equals(3));
   });
 
   test("finding another path", () {
-    List<Point> path = findPath(new Point(0, 0), new Point(-400, -400));
+    Scene scene = new Scene();
+    List<Point> path = scene.findPath(new Point(0, 0), new Point(-400, -400));
     expect(path.length, equals(800));
   });
 
