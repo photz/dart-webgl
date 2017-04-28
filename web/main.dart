@@ -56,6 +56,9 @@ class WebGlApp {
 
     var sphere = new MySphere.create(_scene, _gl, 5, 5,
         new Vector3(1.0, 1.0, 0.0));
+    var sphere2 = new MySphere.create(_scene, _gl, 5, 5,
+        new Vector3(0.0, 1.0, 1.0));
+    _scene.addToScene(sphere2);
     _scene.addToScene(sphere);
     _scene.addToScene(new Cube.create(this._gl, 1, 3,
             new Vector3(0.0, 1.0, 0.0)));
@@ -65,7 +68,8 @@ class WebGlApp {
             new Vector3(1.0, 0.0, 1.0)));
 
 
-    sphere.navigate(50, 5);
+    sphere.navigate(40, 10);
+    sphere2.navigate(50, 5);
 
     this._gl.enable(DEPTH_TEST);
 
