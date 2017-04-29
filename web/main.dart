@@ -45,6 +45,7 @@ class WebGlApp {
 
     this._scene = new scene.Scene();
 
+    document.body.onMouseDown.listen(this._onMouseDown);
     document.onVisibilityChange.listen(this._onVisibilityChange);
     document.body.onKeyUp.listen(this._onKeyUp);
     window.onKeyDown.listen(this._onKeyDown);
@@ -282,6 +283,10 @@ class WebGlApp {
         _running = false;
         break;
     }
+  }
+
+  void _onMouseDown(MouseEvent e) {
+    _player.shoot();
   }
 }
 

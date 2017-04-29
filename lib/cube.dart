@@ -268,6 +268,11 @@ class Cube {
     }
   }
 
+  void shoot() {
+    print('shoot!');
+    // TODO
+  }
+
   void _setUpPointers() {
     gl.bindBuffer(ARRAY_BUFFER, _buffer);
     gl.vertexAttribPointer(this._a('a_Position'),
