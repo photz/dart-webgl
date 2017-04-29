@@ -45,6 +45,7 @@ class WebGlApp {
 
     this._scene = new scene.Scene();
 
+    document.onVisibilityChange.listen(this._onVisibilityChange);
     document.body.onKeyUp.listen(this._onKeyUp);
     window.onKeyDown.listen(this._onKeyDown);
     document.body.onMouseMove.listen(this._onMouseMove);
@@ -265,6 +266,18 @@ class WebGlApp {
   /// Gets called when the player moves the mouse
   void _onMouseMove(e) {
     _player.setAngle(_player.angle - e.movement.x / 40);
+  }
+
+  // Gets called when the user switches tabs.
+  void _onVisibilityChange(e) {
+    switch (document.visibilityState) {
+      case 'visible':
+        break;
+
+      case 'hidden':
+        _running = false;
+        break;
+    }
   }
 }
 
