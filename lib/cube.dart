@@ -54,15 +54,19 @@ class Cube {
     _coords = new Vector3(x as double, 0.0, y as double);
   }
 
+  Vector3 _getForwardVector() {
+    Matrix4 mat = new Matrix4
+      .rotationY(_angle);
+
+    Vector4 testVec = new Vector4(1.0, 0.0, 0.0, 0.0);
+
+    testVec = mat * testVec;
+
+    return testVec.xyz;
+  }
+
   void updateLocation() {
     if (_forwardDirection != 0) {
-      Matrix4 mat = new Matrix4
-        .rotationY(_angle);
-
-      Vector4 testVec = new Vector4(1.0, 0.0, 0.0, 0.0);
-
-      testVec = mat * testVec;
-
       int now = (new DateTime.now()).microsecondsSinceEpoch;
 
       int microsecondsPassed = now - _lastUpdateForward;
@@ -70,7 +74,9 @@ class Cube {
       double distanceTravelled =
         microsecondsPassed * distanceTravelledPerSecond / microsecondsPerSecond;
 
-      _coords.addScaled(testVec.xyz, _forwardDirection * distanceTravelled);
+      Vector3 forwardVector = _getForwardVector();
+
+      _coords.addScaled(forwardVector, _forwardDirection * distanceTravelled);
 
       _lastUpdateForward = now;
     }
