@@ -28,7 +28,7 @@ class Grid {
   void draw(Matrix4 viewMatrix, time) {
     _gl.useProgram(_program);
 
-    const int nVertices = 10 * 10 * 2 * 3;
+    const int nVertices = 100 * 100 * 2 * 3;
 
     _gl.uniformMatrix4fv(this._u('u_ViewMatrix'),
         false,
@@ -44,7 +44,7 @@ class Grid {
 
     _gl.bindBuffer(ARRAY_BUFFER, buffer);
 
-    Float32List gridData = _generateGrid(10, 10);
+    Float32List gridData = _generateGrid(100, 100);
 
     _gl.bufferData(ARRAY_BUFFER, gridData, STATIC_DRAW);
 
