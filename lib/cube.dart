@@ -32,6 +32,8 @@ class Cube {
   int get y => _coords.z.round();
   double get angle => _angle;
   Vector3 get color => _color;
+  Vector3 get forward => _getForwardVector();
+  Vector3 get coords => getWorldCoordinates();
 
   Cube.create(RenderingContext gl, int x, int y, Vector3 color)
     : _color = color {
