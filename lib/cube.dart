@@ -208,19 +208,11 @@ class Cube {
     }
   }
 
-  void stopMovingForward() {
-    _forwardDirection = 0;
-  }
-
   void setMovingBackward() {
     if (_forwardDirection != -1) {
       _lastUpdateForward = (new DateTime.now()).microsecondsSinceEpoch;
       _forwardDirection = -1;
     }
-  }
-
-  void stopMovingBackward() {
-    _forwardDirection = 0;
   }
 
   void setMovingLeft() {
@@ -230,10 +222,6 @@ class Cube {
     }
   }
 
-  void stopMovingLeft() {
-    _sidewaysDirection = 0;
-  }
-
   void setMovingRight() {
     if (_sidewaysDirection != -1) {
       _sidewaysDirection = -1;
@@ -241,9 +229,10 @@ class Cube {
     }
   }
 
-  void stopMovingRight() {
-    _sidewaysDirection = 0;
-  }
+  stopMovingBackward() => _forwardDirection = 0;
+  stopMovingForward() => _forwardDirection = 0;
+  stopMovingLeft() => _sidewaysDirection = 0;
+  stopMovingRight() => _sidewaysDirection = 0;
 
   void _setUpPointers() {
     gl.bindBuffer(ARRAY_BUFFER, _buffer);
