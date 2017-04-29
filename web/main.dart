@@ -144,6 +144,8 @@ class WebGlApp {
   }
 
   void _redraw(time) {
+    this._sphere.navigate(_player.x-1, _player.y);
+
     _updateAis();
 
     this._gl.clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);

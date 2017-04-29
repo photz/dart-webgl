@@ -73,10 +73,35 @@ class MySphere {
   Vector3 getWorldCoordinates() {
     double multiplier = 1.0;
 
+
     Vector3 worldCoordinates = new Vector3(
         this._x * multiplier + 0.5,
         0.5,
         this._y * multiplier + 0.5);
+
+    if (!_path.isEmpty) {
+      scene.Point nextPoint = _path.first;
+
+      Vector3 nextVector = new Vector3(
+          nextPoint.x * multiplier + 0.5,
+          0.5,
+          nextPoint.y * multiplier + 0.5);
+
+      Vector direction = nextVector - worldCoordinates;
+
+      int now = (new DateTime.now()).microsecondsSinceEpoch;
+
+      // 1 second
+      int fullStepInterval = 1000 * 1000;      
+
+      int timeSinceUpdate = now - _lastNavUpdate;
+
+      var scale = timeSinceUpdate / fullStepInterval;
+
+      worldCoordinates.addScaled(direction, scale);
+    }
+
+
 
     return worldCoordinates;
   }
@@ -147,22 +172,15 @@ class MySphere {
       if (_goalChanged || !_isPathFree(_path)) {
         scene.Point currentPos = new scene.Point(x, y);
 
-        var path = _scene.findPath(currentPos, _goal);
-
-        if (path == false) {
+        try {
+          _path = _scene.findPath(currentPos, _goal);
+        } on scene.NoPathToDestination {
+          // currently unable to go there
           _path = [];
-          print('currently unable to go there');
-        }
-        else {
-          _path = path;
         }
 
         _goalChanged = false;
       }
-
-
-
-      //_lastNavUpdate = (new DateTime.now()).microsecondsSinceEpoch;
     }
   }
 
@@ -241,6 +259,7 @@ class MySphere {
     _goalChanged = true;
   }
 
+  /// Checks if the given path is free of obstacles
   bool _isPathFree(List<scene.Point> path) =>
       path.every((p) => _scene.isFree(p.x, p.y));
 }

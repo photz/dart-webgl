@@ -1,5 +1,8 @@
 import 'package:webgltest/heap.dart';
 
+class NoPathToDestination extends StateError {
+  NoPathToDestination(String msg) : super(msg);
+}
 
 class Point {
   int x;
@@ -75,6 +78,10 @@ class Scene {
 
   /// Finds a path from the given origin to destination.
   List<Point> findPath(Point origin, Point dest) {
+    if (!isFree(dest.x, dest.y)) {
+      throw new NoPathToDestination('');
+    }
+
     Heap open = new Heap((record) => record.fscore);
 
     Grid grid = new Grid();
@@ -118,7 +125,7 @@ class Scene {
       nextUp.explored = true;
     }
 
-    return false;
+    throw new NoPathToDestination('');
   }
 
   List<Point> _getPath(Grid grid, Point origin, Point dest) {
