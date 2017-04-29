@@ -239,6 +239,10 @@ class WebGlApp {
         _player.setMovingRight();
         break;
 
+      case KeyCode.SPACE:
+        _player.jump();
+        break;
+
       case KeyCode.C:
         _createBlock();
         break;

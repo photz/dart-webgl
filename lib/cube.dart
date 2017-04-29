@@ -25,7 +25,9 @@ class Cube {
   int _lastUpdateForward = 0;
   int _sidewaysDirection = 0;
   int _lastUpdateSideways = 0;
-  
+  bool _jumping = false;
+  int _beganJumping = 0;
+
   int get x => _coords.x.round();
   int get y => _coords.z.round();
   double get angle => _angle;
@@ -91,6 +93,25 @@ class Cube {
       _coords.addScaled(testVec.xyz, _sidewaysDirection * distanceTravelled);
 
       _lastUpdateSideways = now;
+    }
+
+    if (_jumping) {
+      int now = (new DateTime.now()).microsecondsSinceEpoch;
+
+      int microsecondsPassed = now - _beganJumping;
+
+      double secondsPassed = microsecondsPassed / microsecondsPerSecond;
+
+      double upSpeed = 3.0;
+
+      double y = upSpeed * secondsPassed - 5.0 * Math.pow(secondsPassed, 2);
+
+      _coords.y = Math.max(0.0, y);
+
+      if (y < 0) {
+        _jumping = false;
+        _beganJumping = 0;
+      }
     }
   }
 
@@ -233,6 +254,13 @@ class Cube {
   stopMovingForward() => _forwardDirection = 0;
   stopMovingLeft() => _sidewaysDirection = 0;
   stopMovingRight() => _sidewaysDirection = 0;
+
+  void jump() {
+    if (0 == _coords.y && !_jumping) {
+      _jumping = true;
+      _beganJumping = (new DateTime.now()).microsecondsSinceEpoch;
+    }
+  }
 
   void _setUpPointers() {
     gl.bindBuffer(ARRAY_BUFFER, _buffer);
