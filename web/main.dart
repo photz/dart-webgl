@@ -233,7 +233,6 @@ class WebGlApp {
   }
 
   void _onKeyDown(KeyboardEvent e) {
-    double angle = Math.PI / 2;
     switch (e.keyCode) {
       case KeyCode.UP:
       case KeyCode.W:
