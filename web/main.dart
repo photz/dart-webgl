@@ -26,6 +26,7 @@ class WebGlApp {
   scene.Scene _scene;
   var _player;
   int _lastAiUpdate = 0;
+  MySphere _sphere;
 
   WebGlApp(int width, int height) {
 
@@ -44,7 +45,9 @@ class WebGlApp {
 
     this._scene = new scene.Scene();
 
-    document.body.onKeyDown.listen(this._onKeyDown);
+    document.body.onKeyUp.listen(this._onKeyUp);
+    window.onKeyDown.listen(this._onKeyDown);
+    document.body.onMouseMove.listen(this._onMouseMove);
 
     this._grid = new Grid.create(this._gl);
 
@@ -54,12 +57,12 @@ class WebGlApp {
 
     _scene.addToScene(_player);
 
-    var sphere = new MySphere.create(_scene, _gl, 5, 5,
+    this._sphere = new MySphere.create(_scene, _gl, 5, 5,
         new Vector3(1.0, 1.0, 0.0));
     var sphere2 = new MySphere.create(_scene, _gl, 5, 5,
         new Vector3(0.0, 1.0, 1.0));
     _scene.addToScene(sphere2);
-    _scene.addToScene(sphere);
+    _scene.addToScene(this._sphere);
     _scene.addToScene(new Cube.create(this._gl, 1, 3,
             new Vector3(0.0, 1.0, 0.0)));
     _scene.addToScene(new Cube.create(this._gl, 2, 3,
@@ -68,7 +71,6 @@ class WebGlApp {
             new Vector3(1.0, 0.0, 1.0)));
 
 
-    sphere.navigate(40, 10);
     sphere2.navigate(50, 5);
 
     this._gl.enable(DEPTH_TEST);
@@ -189,10 +191,57 @@ class WebGlApp {
             new Vector3(1.0, 0.0, 1.0)));
   }
 
+  void _onKeyUp(KeyboardEvent e) {
+    switch (e.keyCode) {
+      case KeyCode.UP:
+      case KeyCode.W:
+        _player.stopMovingForward();
+        break;
+
+      case KeyCode.DOWN:
+      case KeyCode.S:
+        _player.stopMovingBackward();
+        break;
+
+      case KeyCode.LEFT:
+      case KeyCode.A:
+        _player.stopMovingLeft();
+        break;
+
+      case KeyCode.RIGHT:
+      case KeyCode.D:
+        _player.stopMovingRight();
+        break;
+    }
+  }
+
   void _onKeyDown(KeyboardEvent e) {
     double angle = Math.PI / 2;
-
     switch (e.keyCode) {
+      case KeyCode.UP:
+      case KeyCode.W:
+        _player.setMovingForward();
+        break;
+
+      case KeyCode.DOWN:
+      case KeyCode.S:
+        _player.setMovingBackward();
+        break;
+
+      case KeyCode.LEFT:
+      case KeyCode.A:
+        _player.setMovingLeft();
+        break;
+
+      case KeyCode.RIGHT:
+      case KeyCode.D:
+        _player.setMovingRight();
+        break;
+
+      case KeyCode.SPACE:
+        _createBlock();
+        break;
+
       case KeyCode.V:
         switch (_viewMode) {
           case ViewMode.FIRST_PERSON:
@@ -204,33 +253,6 @@ class WebGlApp {
         }
         break;
 
-      case KeyCode.SPACE:
-        _createBlock();
-        break;
-
-      case KeyCode.LEFT:
-        _player.goTo(_player.x-1, _player.y);
-        break;
-
-      case KeyCode.RIGHT:
-        _player.goTo(_player.x+1, _player.y);
-        break;
-
-      case KeyCode.UP:
-        _player.goTo(_player.x, _player.y-1);
-        break;
-
-      case KeyCode.DOWN:
-        _player.goTo(_player.x, _player.y+1);
-        break;
-
-      case KeyCode.Q:
-        _player.setAngle(_player.angle + angle);
-        break;
-      case KeyCode.E:
-        _player.setAngle(_player.angle - angle);
-        break;
-
       case KeyCode.P:
         this._running = !this._running;
         if (this._running) {
@@ -238,8 +260,11 @@ class WebGlApp {
         }
         break;
     }
+  }
 
-    //this._redraw(0.1);
+  /// Gets called when the player moves the mouse
+  void _onMouseMove(e) {
+    _player.setAngle(_player.angle - e.movement.x / 40);
   }
 }
 

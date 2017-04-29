@@ -9,20 +9,25 @@ import 'package:webgltest/model.dart';
 import 'package:webgltest/utils.dart';
 
 class Cube {
+  static const double distanceTravelledPerSecond = 2.1;
+  static const double microsecondsPerSecond = 1000.0 * 1000.0;
 
   static RenderingContext _gl;
   static Program _program;
   static Buffer _buffer;
-
+  
   RenderingContext get gl => _gl;
   Program get program => _program;
-  int _x;
-  int _y;
   double _angle = 0.0;
   Vector3 _color;
+  Vector3 _coords;
+  int _forwardDirection = 0;
+  int _lastUpdateForward = 0;
+  int _sidewaysDirection = 0;
+  int _lastUpdateSideways = 0;
   
-  int get x => _x;
-  int get y => _y;
+  int get x => _coords.x.round();
+  int get y => _coords.z.round();
   double get angle => _angle;
   Vector3 get color => _color;
 
@@ -37,7 +42,6 @@ class Cube {
       _gl.useProgram(program);
       Model m = new Model.fromObj(myLoadModel('cube.obj'));
 
-
       _buffer = this._fillBufferWithModelData(m);
       this._setUpPointers();
     }
@@ -45,17 +49,56 @@ class Cube {
     assert(_gl.isProgram(_program));
     assert(_gl.isBuffer(_buffer));
 
-    this._x = x;
-    this._y = y;
+    _coords = new Vector3(x as double, 0.0, y as double);
+  }
+
+  void updateLocation() {
+    if (_forwardDirection != 0) {
+      Matrix4 mat = new Matrix4
+        .rotationY(_angle);
+
+      Vector4 testVec = new Vector4(1.0, 0.0, 0.0, 0.0);
+
+      testVec = mat * testVec;
+
+      int now = (new DateTime.now()).microsecondsSinceEpoch;
+
+      int microsecondsPassed = now - _lastUpdateForward;
+
+      double distanceTravelled =
+        microsecondsPassed * distanceTravelledPerSecond / microsecondsPerSecond;
+
+      _coords.addScaled(testVec.xyz, _forwardDirection * distanceTravelled);
+
+      _lastUpdateForward = now;
+    }
+
+    if (_sidewaysDirection != 0) {
+      Matrix4 mat = new Matrix4
+        .rotationY(_angle);
+
+      Vector4 testVec = new Vector4(0.0, 0.0, -1.0, 0.0);
+
+      testVec = mat * testVec;
+
+      int now = (new DateTime.now()).microsecondsSinceEpoch;
+
+      int microsecondsPassed = now - _lastUpdateSideways;
+
+      double distanceTravelled =
+        microsecondsPassed * distanceTravelledPerSecond / microsecondsPerSecond;
+
+      _coords.addScaled(testVec.xyz, _sidewaysDirection * distanceTravelled);
+
+      _lastUpdateSideways = now;
+    }
   }
 
   Vector3 getWorldCoordinates() {
-    double multiplier = 1.0;
-
     Vector3 worldCoordinates = new Vector3(
-        this._x * multiplier + 0.5,
-        0.0,
-        this._y * multiplier + 0.5);
+        _coords.x + 0.5,
+        _coords.y,
+        _coords.z + 0.5);
 
     return worldCoordinates;
   }
@@ -64,15 +107,16 @@ class Cube {
     this._angle = newAngle;
   }
 
-
   void goTo(int x, int y) {
-    this._x = x;
-    this._y = y;
+    _coords.x = x as double;
+    _coords.z = y as double;
   }
 
   void draw(Matrix4 mvp, time, Vector3 lightColor,
       Vector3 lightDirection, Vector3 ambientLightColor,
       Vector3 lightPosition) {
+
+    updateLocation();
 
     gl.useProgram(this.program);    
 
@@ -157,6 +201,49 @@ class Cube {
     return buffer;
   }
 
+  void setMovingForward() {
+    if (_forwardDirection != 1) {
+      _lastUpdateForward = (new DateTime.now()).microsecondsSinceEpoch;
+      _forwardDirection = 1;
+    }
+  }
+
+  void stopMovingForward() {
+    _forwardDirection = 0;
+  }
+
+  void setMovingBackward() {
+    if (_forwardDirection != -1) {
+      _lastUpdateForward = (new DateTime.now()).microsecondsSinceEpoch;
+      _forwardDirection = -1;
+    }
+  }
+
+  void stopMovingBackward() {
+    _forwardDirection = 0;
+  }
+
+  void setMovingLeft() {
+    if (_sidewaysDirection != 1) {
+      _sidewaysDirection = 1;
+      _lastUpdateSideways = (new DateTime.now()).microsecondsSinceEpoch;
+    }
+  }
+
+  void stopMovingLeft() {
+    _sidewaysDirection = 0;
+  }
+
+  void setMovingRight() {
+    if (_sidewaysDirection != -1) {
+      _sidewaysDirection = -1;
+      _lastUpdateSideways = (new DateTime.now()).microsecondsSinceEpoch;
+    }
+  }
+
+  void stopMovingRight() {
+    _sidewaysDirection = 0;
+  }
 
   void _setUpPointers() {
     gl.bindBuffer(ARRAY_BUFFER, _buffer);
