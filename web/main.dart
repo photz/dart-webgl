@@ -8,6 +8,9 @@ import 'dart:math' as Math;
 import 'package:webgltest/grid.dart';
 import 'package:webgltest/sphere.dart';
 import 'package:webgltest/scene.dart' as scene;
+import 'package:webgltest/projectile.dart';
+import 'package:webgltest/projectile_renderer.dart';
+
 
 enum ViewMode {
   FIRST_PERSON,
@@ -27,6 +30,8 @@ class WebGlApp {
   var _player;
   int _lastAiUpdate = 0;
   MySphere _sphere;
+  final List<Projectile> _projectiles = [];
+  ProjectileRenderer _projectileRenderer;
 
   WebGlApp(int width, int height) {
 
@@ -71,6 +76,9 @@ class WebGlApp {
             new Vector3(0.0, 0.0, 1.0)));
     _scene.addToScene(new Cube.create(this._gl, 4, 1,
             new Vector3(1.0, 0.0, 1.0)));
+
+
+    _projectileRenderer = new ProjectileRenderer(_gl);
 
 
     sphere2.navigate(50, 5);
@@ -167,6 +175,13 @@ class WebGlApp {
     final Vector3 lightPosition = new Vector3(10.0, 10.0, 10.0);
 
     this._grid.draw(mvp, time);
+
+
+    _projectiles.retainWhere((p) => p.coords.x.abs() < 100.0 &&
+        p.coords.y.abs() < 100.0 &&
+        p.coords.z.abs() < 100.0);
+    _projectiles.forEach((p) => p.updatePosition());
+    _projectileRenderer.render(mvp, _projectiles);
 
     _scene.forEachObject((obj) {
       obj.draw(mvp, time,
@@ -286,7 +301,15 @@ class WebGlApp {
   }
 
   void _onMouseDown(MouseEvent e) {
-    _player.shoot();
+
+    Vector3 initialPos = _player.coords + new Vector3(0.0, 0.5, 0.0);
+
+    Projectile p = new Projectile(_player,
+        initialPos, _player.forward);
+
+    _projectiles.add(p);
+
+    //_player.shoot();
   }
 }
 
