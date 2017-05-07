@@ -6,8 +6,9 @@ class Networked {
   String _host;
   int _port;
   WebSocket _ws;
+  var _onGetStateCb;
 
-  Networked(this._host, this._port) {
+  Networked(this._host, this._port, this._onGetStateCb) {
     _ws = new WebSocket('ws://${_host}:${_port}');
     _ws.onOpen.listen(_onOpen);
   }

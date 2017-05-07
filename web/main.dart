@@ -43,7 +43,7 @@ class WebGlApp {
 
   WebGlApp(int width, int height) {
 
-    _nw = new Networked('127.0.0.1', 43105);
+    _nw = new Networked('127.0.0.1', 4000, _onGetState);
 
     this._canvas = new CanvasElement();
 
