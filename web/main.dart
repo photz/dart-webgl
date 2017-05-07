@@ -71,27 +71,9 @@ class WebGlApp {
     _player = new Cube.create(this._gl, 1, 4,
         new Vector3(1.0, 0.0, 0.0));
 
-
     _scene.addToScene(_player);
 
-    this._sphere = new MySphere.create(_scene, _gl, 5, 5,
-        new Vector3(1.0, 1.0, 0.0));
-    var sphere2 = new MySphere.create(_scene, _gl, 5, 5,
-        new Vector3(0.0, 1.0, 1.0));
-    _scene.addToScene(sphere2);
-    _scene.addToScene(this._sphere);
-    _scene.addToScene(new Cube.create(this._gl, 1, 3,
-            new Vector3(0.0, 1.0, 0.0)));
-    _scene.addToScene(new Cube.create(this._gl, 2, 3,
-            new Vector3(0.0, 0.0, 1.0)));
-    _scene.addToScene(new Cube.create(this._gl, 4, 1,
-            new Vector3(1.0, 0.0, 1.0)));
-
-
     _projectileRenderer = new ProjectileRenderer(_gl);
-
-
-    sphere2.navigate(50, 5);
 
     this._gl.enable(DEPTH_TEST);
 
