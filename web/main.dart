@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:vector_math/vector_math.dart';
 import 'dart:typed_data';
 import 'dart:html';
@@ -17,6 +18,74 @@ enum ViewMode {
   THIRD_PERSON
 }
 
+class Networked {
+
+  String _host;
+  int _port;
+  WebSocket _ws;
+
+  Networked(this._host, this._port) {
+    _ws = new WebSocket('ws://${_host}:${_port}');
+    _ws.onOpen.listen(_onOpen);
+  }
+
+  void _onOpen(e) {
+    _ws.onMessage.listen(_onMessage);
+  }
+
+  void _onMessage(MessageEvent e) {
+    var data = JSON.decode(e.data);
+  }
+
+  void _sendAsJson(obj) {
+    String json = JSON.encode(obj);
+    _ws.send(json);
+  }
+
+  void moveLeft() {
+    _sendAsJson({
+      'type': 'left'
+    });
+  }
+
+  void moveRight() {
+    _sendAsJson({
+      'type': 'right'
+    });
+  }
+
+  void forward() {
+    _sendAsJson({
+      'type': 'forward'
+    });
+  }
+
+  void backward() {
+    _sendAsJson({
+      'type': 'backward'
+    });
+  }
+
+  void stopFrontal() {
+    _sendAsJson({
+      'type': 'stop_frontal'
+    });
+  }
+
+  void stopLateral() {
+    _sendAsJson({
+      'type': 'stop_lateral'
+    });
+  }
+
+  void turn(absoluteAngle) {
+    _sendAsJson({
+      'type': 'turn',
+      'angle': absoluteAngle
+    });
+  }
+}
+
 class WebGlApp {
   CanvasElement _canvas;
   RenderingContext _gl;
@@ -32,8 +101,15 @@ class WebGlApp {
   MySphere _sphere;
   final List<Projectile> _projectiles = [];
   ProjectileRenderer _projectileRenderer;
+  Networked _nw;
+  bool _upKeyPressed = false;
+  bool _downKeyPressed = false;
+  bool _leftKeyPressed = false;
+  bool _rightKeyPressed = false;
 
   WebGlApp(int width, int height) {
+
+    _nw = new Networked('127.0.0.1', 43105);
 
     this._canvas = new CanvasElement();
 
@@ -212,22 +288,30 @@ class WebGlApp {
     switch (e.keyCode) {
       case KeyCode.UP:
       case KeyCode.W:
+        _nw.stopFrontal();
         _player.stopMovingForward();
+        _upKeyPressed = false;
         break;
 
       case KeyCode.DOWN:
       case KeyCode.S:
+        _nw.stopFrontal();
         _player.stopMovingBackward();
+        _downKeyPressed = false;
         break;
 
       case KeyCode.LEFT:
       case KeyCode.A:
+        _nw.stopLateral();
         _player.stopMovingLeft();
+        _leftKeyPressed = false;
         break;
 
       case KeyCode.RIGHT:
       case KeyCode.D:
+        _nw.stopLateral();
         _player.stopMovingRight();
+        _rightKeyPressed = false;
         break;
     }
   }
@@ -236,22 +320,38 @@ class WebGlApp {
     switch (e.keyCode) {
       case KeyCode.UP:
       case KeyCode.W:
-        _player.setMovingForward();
+        if (!_upKeyPressed) {
+          _nw.forward();
+          _player.setMovingForward();
+          _upKeyPressed = true;
+        }
         break;
 
       case KeyCode.DOWN:
       case KeyCode.S:
-        _player.setMovingBackward();
+        if (!_downKeyPressed) {
+          _nw.backward();
+          _player.setMovingBackward();
+          _downKeyPressed = true;
+        }
         break;
 
       case KeyCode.LEFT:
       case KeyCode.A:
-        _player.setMovingLeft();
+        if (!_leftKeyPressed) {
+          _player.setMovingLeft();
+          _leftKeyPressed = true;
+          _nw.moveLeft();
+        }
         break;
 
       case KeyCode.RIGHT:
       case KeyCode.D:
-        _player.setMovingRight();
+        if (!_rightKeyPressed) {
+          _nw.moveRight();
+          _player.setMovingRight();
+          _rightKeyPressed = true;
+        }
         break;
 
       case KeyCode.SPACE:
@@ -284,7 +384,9 @@ class WebGlApp {
 
   /// Gets called when the player moves the mouse
   void _onMouseMove(e) {
-    _player.setAngle(_player.angle - e.movement.x / 40);
+    var newAngle = _player.angle - e.movement.x / 40;
+    _nw.turn(newAngle);
+    _player.setAngle(newAngle);
   }
 
   // Gets called when the user switches tabs.
