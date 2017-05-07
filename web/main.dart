@@ -301,8 +301,12 @@ class WebGlApp {
   /// Gets called when the player moves the mouse
   void _onMouseMove(e) {
     var newAngle = _player.angle - e.movement.x / 40;
-    _nw.turn(newAngle);
+
     _player.setAngle(newAngle);
+
+    if (0.3 < (newAngle - _lastAngleTransmitted).abs()) {
+      _nw.turn(newAngle);
+    }
   }
 
   // Gets called when the user switches tabs.
@@ -315,6 +319,12 @@ class WebGlApp {
         _running = false;
         break;
     }
+  }
+
+  void _onGetState(x, z, angle) {
+    _player.setWorldCoordinates(x, z);
+    _player.setAngle(angle);
+    print('state: ${x} ${z} ${angle}');
   }
 
   void _onMouseDown(MouseEvent e) {

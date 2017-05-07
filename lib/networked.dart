@@ -18,6 +18,10 @@ class Networked {
 
   void _onMessage(MessageEvent e) {
     var data = JSON.decode(e.data);
+    var x = data['x'];
+    var z = data['z'];
+    var angle = data['angle'];
+    _onGetStateCb(x, z, angle);
   }
 
   void _sendAsJson(obj) {

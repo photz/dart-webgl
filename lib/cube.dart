@@ -123,6 +123,11 @@ class Cube {
     }
   }
 
+  void setWorldCoordinates(x, z) {
+    _coords.x = x;
+    _coords.z = z;
+  }
+
   Vector3 getWorldCoordinates() {
     Vector3 worldCoordinates = new Vector3(
         _coords.x + 0.5,
