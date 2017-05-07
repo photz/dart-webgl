@@ -60,7 +60,7 @@ class Cube {
     Matrix4 mat = new Matrix4
       .rotationY(_angle);
 
-    Vector4 testVec = new Vector4(1.0, 0.0, 0.0, 0.0);
+    Vector4 testVec = new Vector4(0.0, 0.0, 1.0, 0.0);
 
     testVec = mat * testVec;
 
@@ -87,7 +87,7 @@ class Cube {
       Matrix4 mat = new Matrix4
         .rotationY(_angle);
 
-      Vector4 testVec = new Vector4(0.0, 0.0, -1.0, 0.0);
+      Vector4 testVec = new Vector4(1.0, 0.0, 0.0, 0.0);
 
       testVec = mat * testVec;
 

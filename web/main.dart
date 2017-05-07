@@ -105,7 +105,7 @@ class WebGlApp {
         Matrix4 mat = new Matrix4
           .rotationY(_player.angle);
 
-        Vector4 testVec = new Vector4(1.0, 0.0, 0.0, 0.0);
+        Vector4 testVec = new Vector4(0.0, 0.0, 1.0, 0.0);
 
         testVec = mat * testVec;
 
@@ -115,7 +115,7 @@ class WebGlApp {
       case ViewMode.THIRD_PERSON:
         const double distance = 20.0;
 
-        Vector4 test = new Vector4(distance, 0.0, 0.0, 1.0);
+        Vector4 test = new Vector4(0.0, 0.0, distance, 1.0);
 
         Matrix4 mat = new Matrix4.rotationY(_player.angle);
 
