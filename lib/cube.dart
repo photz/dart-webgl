@@ -9,7 +9,7 @@ import 'package:webgltest/model.dart';
 import 'package:webgltest/utils.dart';
 
 class Cube {
-  static const double distanceTravelledPerSecond = 2.1;
+  static const double distanceTravelledPerSecond = 1.0;
   static const double microsecondsPerSecond = 1000.0 * 1000.0;
 
   static RenderingContext _gl;
