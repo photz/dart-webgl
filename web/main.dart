@@ -9,7 +9,6 @@ import 'package:vector_math/vector_math.dart';
 import 'package:webgltest/cube.dart';
 import 'package:webgltest/networked.dart';
 import 'package:webgltest/grid.dart';
-import 'package:webgltest/sphere.dart';
 import 'package:webgltest/scene.dart' as scene;
 import 'package:webgltest/projectile.dart';
 import 'package:webgltest/projectile_renderer.dart';
@@ -32,7 +31,6 @@ class WebGlApp {
   scene.Scene _scene;
   var _player;
   int _lastAiUpdate = 0;
-  MySphere _sphere;
   final List<Projectile> _projectiles = [];
   ProjectileRenderer _projectileRenderer;
   Networked _nw;
@@ -148,8 +146,6 @@ class WebGlApp {
   }
 
   void _redraw(time) {
-    this._sphere.navigate(_player.x-1, _player.y);
-
     _updateAis();
 
     this._gl.clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
