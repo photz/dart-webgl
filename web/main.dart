@@ -38,6 +38,7 @@ class WebGlApp {
   bool _downKeyPressed = false;
   bool _leftKeyPressed = false;
   bool _rightKeyPressed = false;
+  double _lastAngleTransmitted = 0.0;
 
   WebGlApp(int width, int height) {
 
