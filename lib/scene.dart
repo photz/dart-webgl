@@ -59,13 +59,25 @@ class Grid {
 
 class Scene {
   final List _objects;
+  final Map _entityIds;
 
   /// Creates a new scene with nothing in it.
-  Scene() : _objects = new List();
+  Scene() : _objects = new List(), _entityIds = new Map();
 
   /// Adds the given object to the scene.
-  void addToScene(obj) =>_objects.add(obj);
+  void addToScene(String entityId, obj) {
+    _entityIds[entityId] = obj;
 
+    _objects.add(obj);
+  }
+
+  bool entityIdExists(String entityId) {
+    return _entityIds.containsKey(entityId);
+  }
+
+  getByEntityId(String entityId) {
+    return _entityIds[entityId];
+  }
 
   /// Applies the given function to each object in the scene.
   void forEachObject(f) => _objects.forEach(f);

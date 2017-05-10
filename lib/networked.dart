@@ -22,7 +22,10 @@ class Networked {
     var x = data['x'];
     var z = data['z'];
     var angle = data['angle'];
-    _onGetStateCb(x, z, angle);
+    var entityIds = data['entity-ids'];
+    var components = data['components'];
+    var entityId = data['entity-id'];
+    _onGetStateCb(entityId, x, z, angle, entityIds, components);
   }
 
   void _sendAsJson(obj) {

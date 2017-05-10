@@ -39,6 +39,7 @@ class WebGlApp {
   bool _leftKeyPressed = false;
   bool _rightKeyPressed = false;
   double _lastAngleTransmitted = 0.0;
+  String _playerEntityId = '';
 
   WebGlApp(int width, int height) {
 
@@ -67,10 +68,10 @@ class WebGlApp {
 
     this._grid = new Grid.create(this._gl);
 
-    _player = new Cube.create(this._gl, 1, 4,
+    _player = new Cube.create(this._gl, 0, 0,
         new Vector3(1.0, 0.0, 0.0));
 
-    _scene.addToScene(_player);
+    _scene.addToScene('player-has-no-entity-id-yet', _player);
 
     _projectileRenderer = new ProjectileRenderer(_gl);
 
@@ -193,7 +194,7 @@ class WebGlApp {
 
     var pos = _player.getWorldCoordinates() + test.xyz;
 
-    _scene.addToScene(new Cube.create(this._gl, pos.x.round(), pos.z.round(),
+    _scene.addToScene('no-entity-id', new Cube.create(this._gl, pos.x.round(), pos.z.round(),
             new Vector3(1.0, 0.0, 1.0)));
   }
 
@@ -318,10 +319,31 @@ class WebGlApp {
     }
   }
 
-  void _onGetState(x, z, angle) {
-    _player.setWorldCoordinates(x, z);
-    _player.setAngle(angle);
-    print('state: ${x} ${z} ${angle}');
+  void _updateEntities(entityIds, components) {
+    for (var entityId in entityIds) {
+      if (entityId == _playerEntityId) continue;
+
+      var displacement = components['displacement'][entityId];
+      var orientation = components['orientation'][entityId];
+
+      if (_scene.entityIdExists(entityId)) {
+
+        var entity = _scene.getByEntityId(entityId);
+        entity.setWorldCoordinates(displacement[0], displacement[2]);
+        entity.setAngle(orientation);
+      }
+      else {
+        var newEntity = new Cube.create(_gl, displacement[0], displacement[2], new Vector3(1.0, 1.0, 0.8));
+        newEntity.setAngle(orientation);
+        _scene.addToScene(entityId, newEntity);
+      }
+    }
+  }
+
+
+  void _onGetState(entityId, x, z, angle, entityIds, components) {
+    _playerEntityId = entityId;
+    _updateEntities(entityIds, components);
   }
 
   void _onMouseDown(MouseEvent e) {
@@ -332,8 +354,6 @@ class WebGlApp {
         initialPos, _player.forward);
 
     _projectiles.add(p);
-
-    //_player.shoot();
   }
 }
 
