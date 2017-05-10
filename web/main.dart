@@ -43,7 +43,7 @@ class WebGlApp {
 
   WebGlApp(int width, int height) {
 
-    _nw = new Networked('127.0.0.1', 4000, _onGetState);
+    _nw = new Networked('127.0.0.1', 4000, _onConnectionEstablished, _onGetState);
 
     this._canvas = new CanvasElement();
 
@@ -60,11 +60,6 @@ class WebGlApp {
 
     this._scene = new scene.Scene();
 
-    document.body.onMouseDown.listen(this._onMouseDown);
-    document.onVisibilityChange.listen(this._onVisibilityChange);
-    document.body.onKeyUp.listen(this._onKeyUp);
-    window.onKeyDown.listen(this._onKeyDown);
-    document.body.onMouseMove.listen(this._onMouseMove);
 
     this._grid = new Grid.create(this._gl);
 
@@ -80,6 +75,14 @@ class WebGlApp {
     this._ambientLightColor = new Vector3(0.05, 0.05, 0.05);
     this._lightDirection = new Vector3(0.5, 3.0, 4.0);
     this._lightColor = new Vector3(1.0, 1.0, 1.0);
+  }
+
+  void _onConnectionEstablished() {
+    document.body.onMouseDown.listen(this._onMouseDown);
+    document.onVisibilityChange.listen(this._onVisibilityChange);
+    document.body.onKeyUp.listen(this._onKeyUp);
+    window.onKeyDown.listen(this._onKeyDown);
+    document.body.onMouseMove.listen(this._onMouseMove);
   }
 
   startLoop() async {

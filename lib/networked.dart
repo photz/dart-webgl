@@ -7,13 +7,15 @@ class Networked {
   int _port;
   WebSocket _ws;
   var _onGetStateCb;
+  var _onOpenCb;
 
-  Networked(this._host, this._port, this._onGetStateCb) {
+  Networked(this._host, this._port, this._onOpenCb, this._onGetStateCb) {
     _ws = new WebSocket('ws://${_host}:${_port}');
     _ws.onOpen.listen(_onOpen);
   }
 
   void _onOpen(e) {
+    _onOpenCb();
     _ws.onMessage.listen(_onMessage);
   }
 
