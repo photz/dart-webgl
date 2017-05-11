@@ -82,7 +82,17 @@ class WebGlApp {
     document.onVisibilityChange.listen(this._onVisibilityChange);
     document.body.onKeyUp.listen(this._onKeyUp);
     window.onKeyDown.listen(this._onKeyDown);
-    document.body.onMouseMove.listen(this._onMouseMove);
+    document.onPointerLockChange.listen(_onLockChange);
+    document.onPointerLockError.listen(_onLockError);
+    document.body.onMouseMove.listen(_onMouseMove);
+  }
+
+  void _onLockError(e) {
+    // unable to lock the pointer
+  }
+
+  void _onLockChange(e) {
+    // pointer lock was changed occured
   }
 
   startLoop() async {
@@ -350,6 +360,8 @@ class WebGlApp {
   }
 
   void _onMouseDown(MouseEvent e) {
+
+    _canvas.requestPointerLock();
 
     Vector3 initialPos = _player.coords + new Vector3(0.0, 0.5, 0.0);
 
