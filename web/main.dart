@@ -332,31 +332,41 @@ class WebGlApp {
     }
   }
 
-  void _updateEntities(entityIds, components) {
-    for (var entityId in entityIds) {
-      if (entityId == _playerEntityId) continue;
+  void _updateEntities(pointMasses, orientations) {
+    pointMasses.forEach((entityId, pointMass) {
 
-      var displacement = components['displacement'][entityId];
-      var orientation = components['orientation'][entityId];
+      if (!(entityId is String)) {
+        throw new Exception('entityId not a string');
+      }
 
-      if (_scene.entityIdExists(entityId)) {
+      var angle = orientations[entityId]['angle'];
+
+      if (entityId == _playerEntityId) {
+
+      }
+      else if (_scene.entityIdExists(entityId)) {
 
         var entity = _scene.getByEntityId(entityId);
-        entity.setWorldCoordinates(displacement[0], displacement[2]);
-        entity.setAngle(orientation);
+        entity.setWorldCoordinates(pointMass['position']['x'],
+            pointMass['position']['z']);
+        entity.setAngle(angle);
       }
       else {
-        var newEntity = new Cube.create(_gl, displacement[0], displacement[2], new Vector3(1.0, 1.0, 0.8));
-        newEntity.setAngle(orientation);
+        var newEntity = new Cube.create(_gl,
+            pointMass['position']['x'],
+            pointMass['position']['z'],
+            new Vector3(1.0, 1.0, 0.8));
+
+        newEntity.setAngle(angle);
+
         _scene.addToScene(entityId, newEntity);
       }
-    }
+    });
   }
 
-
-  void _onGetState(entityId, x, z, angle, entityIds, components) {
+  void _onGetState(String entityId, pointMasses, orientations) {
     _playerEntityId = entityId;
-    _updateEntities(entityIds, components);
+    _updateEntities(pointMasses, orientations);
   }
 
   void _onMouseDown(MouseEvent e) {

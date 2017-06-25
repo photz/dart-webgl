@@ -21,13 +21,12 @@ class Networked {
 
   void _onMessage(MessageEvent e) {
     var data = JSON.decode(e.data);
-    var x = data['x'];
-    var z = data['z'];
-    var angle = data['angle'];
-    var entityIds = data['entity-ids'];
-    var components = data['components'];
-    var entityId = data['entity-id'];
-    _onGetStateCb(entityId, x, z, angle, entityIds, components);
+
+    var entityId = data['entity_id'];
+    var pointMasses = data['point_masses'];
+    var orientations = data['orientations'];
+
+    _onGetStateCb(entityId.toString(), pointMasses, orientations);
   }
 
   void _sendAsJson(obj) {
