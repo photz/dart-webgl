@@ -36,43 +36,43 @@ class Networked {
 
   void moveLeft() {
     _sendAsJson({
-      'type': 'left'
+      'msg_type': 'left'
     });
   }
 
   void moveRight() {
     _sendAsJson({
-      'type': 'right'
+      'msg_type': 'right'
     });
   }
 
   void forward() {
     _sendAsJson({
-      'type': 'forward'
+      'msg_type': 'forward'
     });
   }
 
   void backward() {
     _sendAsJson({
-      'type': 'backward'
+      'msg_type': 'backward'
     });
   }
 
   void stopFrontal() {
     _sendAsJson({
-      'type': 'stop_frontal'
+      'msg_type': 'stop_frontal'
     });
   }
 
   void stopLateral() {
     _sendAsJson({
-      'type': 'stop_lateral'
+      'msg_type': 'stop_lateral'
     });
   }
 
   void turn(absoluteAngle) {
     _sendAsJson({
-      'type': 'turn',
+      'msg_type': 'turn',
       'angle': absoluteAngle
     });
   }
