@@ -207,8 +207,9 @@ class WebGlApp {
 
     var pos = _player.getWorldCoordinates() + test.xyz;
 
-    _scene.addToScene('no-entity-id', new Cube.create(this._gl, pos.x.round(), pos.z.round(),
-            new Vector3(1.0, 0.0, 1.0)));
+    _nw.createBlock(pos.x.round(),
+        0,
+        pos.z.round());
   }
 
   void _onKeyUp(KeyboardEvent e) {

@@ -76,4 +76,15 @@ class Networked {
       'angle': absoluteAngle
     });
   }
+
+  void createBlock(x, y, z) {
+    _sendAsJson({
+      'msg_type': 'create_block',
+      'position': {
+        'x' : x,
+        'y' : y,
+        'z' : z
+      }
+    });
+  }
 }
